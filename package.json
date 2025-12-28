@@ -1,0 +1,23 @@
+{
+  "name": "paysats-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "paysats monorepo - client, server, and shared packages",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "cd server && npm install && npm run build",
+    "build:client": "cd client && npm install && npm run build",
+    "build": "npm run build:server && npm run build:client",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install && cd ../shared && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
