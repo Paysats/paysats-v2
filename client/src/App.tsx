@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { ConfigProvider, theme } from 'antd'
 import { Route, Routes } from 'react-router-dom'
-
-
+import { AuthProvider } from './contexts/ThemeContext';
+import {Homepage} from './pages/home';
 function App() {
   const [mounted, setMounted] = useState(false);
 
-  // Dark mode is default
+  // Dark mode is default, can be toggled later with a theme context
   useEffect(() => {
     // Ensure light class is not present (dark is default)
     document.documentElement.classList.remove('light');
@@ -31,7 +31,7 @@ function App() {
         }}
       >
         <Routes>
-          <Route path="/" element={<div />} /> 
+          <Route path="/" element={<Homepage />} /> 
         </Routes>
       </ConfigProvider>
   )
