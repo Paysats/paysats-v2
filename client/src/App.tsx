@@ -3,9 +3,11 @@ import './App.css'
 import { ConfigProvider, theme } from 'antd'
 import { Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/ThemeContext';
-import { Homepage } from './pages/home';
+import { Homepage } from './pages/landing/home';
 import { isAppSubdomain } from './utils/isAppSubdomain';
 import NotFound from './pages/NotFound';
+import { AppRoutes } from './routes/AppRoutes';
+import { MarketingRoutes } from './routes/MarketingRoutes';
 function App() {
   const [mounted, setMounted] = useState(false);
 
@@ -34,10 +36,13 @@ function App() {
         algorithm: theme.defaultAlgorithm,
       }}
     >
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+        {
+          isApp ? (
+            <AppRoutes />
+          ) : (
+            <MarketingRoutes />
+          )
+        }
     </ConfigProvider>
   )
 }
