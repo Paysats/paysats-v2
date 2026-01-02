@@ -14,7 +14,7 @@
 
   /* Colors */
 
-  --color-background: #F0FBF6; /* soft off-white / pale mint background */
+  --color-background: #f6f8f7; /* soft off-white / pale mint background */
   --color-foreground: #2C4A3A; /* green-tinted dark text (not pure black) */
   --color-card: #FFFFFF; /* plain white for card-like elements */
   --color-card-foreground: var(--color-foreground); /* foreground text for cards */
