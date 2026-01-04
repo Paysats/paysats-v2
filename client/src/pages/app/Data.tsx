@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, type FC } from "react"
 import { AppLayout } from "@/layouts/AppLayout"
 import { Button } from "@/components/ui/Button"
 import { Form, FormItem } from "@/components/ui/Form"
@@ -16,7 +16,7 @@ interface DataFormProps {
     handleContinue?: (data: any) => void;
 }
 
-export const Data = ({ handleContinue }: DataFormProps) => {
+export const Data:FC<DataFormProps> = ({ handleContinue }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
@@ -185,8 +185,8 @@ export const Data = ({ handleContinue }: DataFormProps) => {
                         <Button
                             size="lg"
                             htmlType="submit"
+                            fullWidth
                             disabled={!phoneNumber || !amount || !selectedNetwork || !selectedPlan}
-                            className="w-full"
                         >
                             Continue
                         </Button>

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/Input"
 import { AppLayout } from "@/layouts/AppLayout"
 import { NETWORK_PROVIDERS, NetworkProviderEnum } from "@/utils/networkProviders"
 import { Bitcoin, PhoneCall } from "lucide-react"
-import { useState } from "react"
+import { useState, type FC } from "react"
 import { TbCurrencyNaira } from "react-icons/tb";
 import { MotionDiv } from "@/components/ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig"
@@ -14,7 +14,7 @@ interface AirtimeFormProps {
     handleContinue?: (data: any) => void;
 }
 
-export const Airtime = ({ handleContinue }: AirtimeFormProps) => {
+export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const amount = Form.useWatch('amount', form);
@@ -136,7 +136,7 @@ export const Airtime = ({ handleContinue }: AirtimeFormProps) => {
                         <p className="text-base text-muted-foreground flex">{amount || '100'} NGN = 0.01 <Bitcoin className="text-primary -rotate-10" size={20} /></p>
                     </MotionDiv>
                     <MotionDiv variants={staggerItemVariants}>
-                        <Button size="lg" htmlType="submit" disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork}>
+                        <Button fullWidth size="lg" htmlType="submit" disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork}>
                             Continue
                         </Button>
                     </MotionDiv>
