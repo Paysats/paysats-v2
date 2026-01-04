@@ -26,7 +26,7 @@ export const SERVICES = [
         isActive: true
     },
     {
-        name: "cable TV",
+        name: "cable tv",
         route: "cable-tv",
         isActive: false,
     },
