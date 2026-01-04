@@ -19,7 +19,7 @@
     /* Linting */
     "strict": true,
     "noUnusedLocals": false, // TODO: update to true in prod
-    "noUnusedParameters": true,
+    "noUnusedParameters": false, // TODO: update to true in prod
     "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,

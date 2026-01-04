@@ -3,7 +3,6 @@ import type { FC } from "react"
 import { MotionDiv, MotionH1, MotionP } from "../ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig"
 import { FloatingIcon } from "../effects/FloatingIcon"
-import { ParticleEffect } from "../effects/ParticleEffect"
 
 export const Hero: FC = () => {
     return (
