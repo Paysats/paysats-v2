@@ -4,9 +4,12 @@ import type { ButtonProps as AntButtonProps } from "antd";
 import { cva, type VariantProps } from "class-variance-authority";
 import React from 'react';
 import { forwardRef } from "react";
+import { motion } from 'framer-motion';
+import { buttonVariants, buttonGlowVariants, springConfigs } from "@/config/animationConfig";
 
+const MotionAntButton = motion(AntButton) as any;
 
-const buttonVariants = cva(
+const buttonStyles = cva(
   "bg-transparent shadow-none !flex !items-center !rounded-md !justify-center !gap-2 !font-medium !transition-colors focus:!outline-none focus:!ring-2 focus:ring-ring focus-visible:outline-hidden focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
@@ -42,10 +45,11 @@ const buttonVariants = cva(
 
 interface ButtonProps
   extends Omit<AntButtonProps, 'size' | 'variant'>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonStyles> {
   className?: string;
   icon?: React.ReactNode;
-  htmlType?: "button" | "submit" | "reset"; 
+  htmlType?: "button" | "submit" | "reset";
+  animate?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -56,31 +60,40 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       size,
       fullWidth,
       icon,
-      htmlType = "button", 
+      htmlType = "button",
       children,
+      animate = true,
       ...props
     },
     ref,
   ) => {
     const antSize = size === "sm" ? "small" : size === "lg" ? "large" : "middle";
 
+    // Only animate if enabled and not disabled
+    const shouldAnimate = animate && !props.disabled && !props.loading;
+
     return (
-      <AntButton
+      <MotionAntButton
         className={cn(
-          buttonVariants({ variant, size, fullWidth,  className }),
+          buttonStyles({ variant, size, fullWidth, className }),
         )}
         size={antSize}
         icon={icon}
-        htmlType={htmlType} 
+        htmlType={htmlType}
         ref={ref}
         {...props}
+        whileHover={shouldAnimate ? "hover" : undefined}
+        whileTap={shouldAnimate ? "tap" : undefined}
+        variants={buttonVariants}
+        // Add glow effect for default variant
+        style={variant === 'default' && shouldAnimate ? { position: 'relative', overflow: 'hidden' } : {}}
       >
         {children}
-      </AntButton>
+      </MotionAntButton>
     );
   },
 );
 
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export { Button, buttonStyles as buttonVariants };

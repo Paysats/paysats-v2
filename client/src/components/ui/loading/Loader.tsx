@@ -42,10 +42,14 @@ export const Loader: React.FC<LoaderProps> = ({
   return (
     <div className="inline-flex flex-col items-center justify-center gap-2">
       <motion.div
-        className={cn(loaderVariants({ size, variant }), className)}
+        className={cn(loaderVariants({ size, variant }).replace('animate-spin', ''), className)}
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.2 }}
+        animate={{ opacity: 1, scale: 1, rotate: 360 }}
+        transition={{
+          opacity: { duration: 0.2 },
+          scale: { duration: 0.2 },
+          rotate: { duration: 1, repeat: Infinity, ease: "linear" }
+        }}
         aria-label={label || 'Loading'}
         role="status"
       />
