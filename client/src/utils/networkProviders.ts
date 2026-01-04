@@ -1,3 +1,9 @@
+// Import images directly so Vite can process them for production
+import mtnLogo from '@/assets/images/network-providers/mtn-logo.jpg';
+import gloLogo from '@/assets/images/network-providers/glo-logo.webp';
+import airtelLogo from '@/assets/images/network-providers/airtel-logo.svg';
+import nineMobileLogo from '@/assets/images/network-providers/9mobile-logo.png';
+
 export enum NetworkProviderEnum {
     MTN = "mtn",
     GLO = "glo",
@@ -8,18 +14,18 @@ export enum NetworkProviderEnum {
 export const NETWORK_PROVIDERS:{ name: string, logo: string }[] = [
     {
         name: "MTN",
-        logo: "/images/network-providers/mtn-logo.jpg",
+        logo: mtnLogo,
     },
     {
         name: "GLO",
-        logo: "/images/network-providers/glo-logo.webp",
+        logo: gloLogo,
     },
     {
         name: "Airtel",
-        logo: "/images/network-providers/airtel-logo.svg",
+        logo: airtelLogo,
     },
     {
         name: "9Mobile",
-        logo: "/images/network-providers/9mobile-logo.png",
+        logo: nineMobileLogo,
     },
 ]

@@ -54,7 +54,7 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                     className="flex flex-col gap-1"
                 >
                     {/* select network */}
-                    <MotionDiv className="flex flex-col gap-4" variants={staggerItemVariants}>
+                    <MotionDiv className="flex flex-col gap-4 mt-1" variants={staggerItemVariants}>
                         <h3 className="text-lg font-semibold">
                             Select Network
                         </h3>
@@ -81,7 +81,7 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                                                     }
                                                     className={`w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 p-2 rounded-lg ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
                                                 >
-                                                    <img src={`src/assets/${provider.logo}`} alt={provider.name} className="w-10 h-10" />
+                                                    <img src={provider.logo} alt={provider.name} className="w-10 h-10" />
                                                     <b>{provider.name}</b>
                                                 </button>
                                             </MotionDiv>
