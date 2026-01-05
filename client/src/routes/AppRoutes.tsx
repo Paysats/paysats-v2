@@ -5,7 +5,7 @@ import { Data } from "@/pages/app/Data";
 import { ElectricityBills } from "@/pages/app/ElectricityBills";
 import { FlightBookings } from "@/pages/app/FlightBookings";
 import { CableTVSubscriptions } from "@/pages/app/CableTVSubscriptions";
-import HotelBookings from "@/pages/app/HotelBookings";
+import { HotelBookings } from "@/pages/app/HotelBookings";
 
 
 export function AppRoutes() {
