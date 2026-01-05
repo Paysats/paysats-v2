@@ -56,7 +56,7 @@ export const ServiceCard: FC<IServiceCard> = ({ title, icon: Icon, isActive }) =
                     )}
                 </MotionDiv>
             </GlowEffect>
-            <span className={`text-sm font-semibold tracking-tight ${isActive ? 'text-foreground' : 'text-[#A0B9B6]'}`}>
+            <span className={`text-sm capitalize font-semibold tracking-tight ${isActive ? 'text-foreground' : 'text-[#A0B9B6]'}`}>
                 {title.charAt(0).toUpperCase() + title.slice(1)}
             </span>
         </div>

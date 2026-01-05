@@ -10,7 +10,7 @@ import { buttonVariants, buttonGlowVariants, springConfigs } from "@/config/anim
 const MotionAntButton = motion(AntButton) as any;
 
 const buttonStyles = cva(
-  "bg-transparent shadow-none !flex !items-center !rounded-md !justify-center !gap-2 !font-medium !transition-colors focus:!outline-none focus:!ring-2 focus:ring-ring focus-visible:outline-hidden focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "bg-transparent !shadow-none !flex !items-center !rounded-md !justify-center !gap-2 !font-medium !transition-colors focus:!outline-none focus:!ring-2 focus:ring-ring focus-visible:outline-hidden focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
@@ -19,10 +19,10 @@ const buttonStyles = cva(
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
           "border border-border bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        secondary: "!bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "!text-primary !border-none !shadow-none underline-offset-4 hover:underline",
-        filled: "bg-accent text-accent-foreground hover:bg-accent/90",
+        filled: "!bg-accent !text-accent-foreground hover:!bg-accent/90",
       },
       size: {
         default: "!h-10 !px-3 !py-0",

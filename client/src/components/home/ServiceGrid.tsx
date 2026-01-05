@@ -1,6 +1,6 @@
 import { SERVICES } from "@shared/constants"
 import { Smartphone, Wifi, Zap, Monitor, Plane, type LucideIcon, Hotel } from "lucide-react"
-import { MdLiveTv } from "react-icons/md";
+import { BiTv } from "react-icons/bi";
 import type { FC } from "react"
 import { ServiceCard } from "./ServiceCard"
 import { Link } from "react-router-dom"
@@ -13,7 +13,7 @@ const ICON_MAP: Record<string, LucideIcon | IconType> = {
     "airtime": Smartphone,
     "data": Wifi,
     "electricity bill": Zap,
-    "cable tv": MdLiveTv,
+    "cable tv": BiTv,
     "flight booking": Plane,
     "hotel booking": Hotel,
 }
@@ -27,8 +27,7 @@ export const ServiceGrid: FC = () => {
             animate="animate"
         >
             {SERVICES.map((service) => {
-                const Icon = ICON_MAP[service.name.toLowerCase()] || Wifi
-                console.log(service.name.toLowerCase())
+                const Icon = ICON_MAP[service.name.toLowerCase()] || Wifi;
                 return (
                     <MotionDiv
                         key={service.name}

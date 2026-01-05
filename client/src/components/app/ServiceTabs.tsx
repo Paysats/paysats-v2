@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
-import { Smartphone, Wifi, Zap, Monitor, Plane, Hotel, type LucideIcon } from 'lucide-react'
+import { Smartphone, Wifi, Zap, Plane, Hotel, type LucideIcon } from 'lucide-react'
+import { BiTv } from "react-icons/bi";
+
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { MotionDiv } from '../ui/MotionComponents';
 import { springConfigs } from '@/config/animationConfig';
+import type { IconType } from 'react-icons/lib';
 
-export const SERVICE_ITEMS: { name: string; icon: LucideIcon; route: string }[] = [
+export const SERVICE_ITEMS: { name: string; icon: LucideIcon | IconType; route: string }[] = [
     {
         name: "Airtime",
         icon: Smartphone,
@@ -23,18 +26,18 @@ export const SERVICE_ITEMS: { name: string; icon: LucideIcon; route: string }[] 
     },
     {
         name: "Cable TV",
-        icon: Monitor,
+        icon: BiTv,
         route: "cable-tv",
     },
     {
         name: "Flight Booking",
         icon: Plane,
-        route: "flight-booking",
+        route: "flights",
     },
     {
-        name: "Hotel Booking",
+        name: "Hotels",
         icon: Hotel,
-        route: "hotel-booking",
+        route: "hotels",
     },
 ]
 
