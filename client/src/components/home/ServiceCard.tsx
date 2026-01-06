@@ -23,7 +23,7 @@ export const ServiceCard: FC<IServiceCard> = ({ title, icon: Icon, isActive }) =
             >
                 <MotionDiv
                     className={`
-                        w-20 h-20 md:w-24 md:h-24 rounded-lg flex items-center justify-center relative
+                        w-16 h-16 md:w-24 md:h-24 rounded-lg flex items-center justify-center relative
                         ${isActive ? 'bg-white transition-transform cursor-pointer' : 'bg-[#E3EEE9]/50 pointer-events-none'}
                     `}
                     variants={isActive ? scaleHoverVariants : {}}

@@ -26,23 +26,23 @@ export const SERVICES = [
         isActive: true
     },
     {
-        name: "cable tv",
+        name: "cable TV",
         route: "cable-tv",
         isActive: false,
     },
     {
         name: "electricity bill",
-        route: "electricity-bill",
+        route: "electricity",
         isActive: false,
     },
     {
         name: "hotel booking",
-        route: "hotel-booking",
+        route: "hotels",
         isActive: false,
     },
     {
         name: "flight booking",
-        route: "flight-booking",
+        route: "flights",
         isActive: false,
     },
 ]

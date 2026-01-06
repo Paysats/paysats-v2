@@ -13,16 +13,16 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children, serviceTabs = true }: AppLayoutProps) => {
     return (
-        <div className="flex flex-col gap-4 mx-auto h-screen py-2 overflow-y-hidden">
+        <div className="flex flex-col gap-3 mx-auto h-screen py-2 overflow-hidden">
             <AppHeader />
             {serviceTabs &&
-                <div className="mx-auto mt-6">
+                <div className="mx-auto mt-3 md:mt-6">
                     <ServiceTabs />
                 </div>
             }
             <AnimatePresence mode="wait">
                 <MotionMain
-                    className="w-full md:max-w-3xl mx-auto flex-grow flex flex-col gap-8 p-4 overflow-y-auto"
+                    className="w-full md:max-w-3xl h-full mx-auto flex-grow flex flex-col gap-8 px-4 overflow-auto "
                     variants={pageTransitionVariants}
                     initial="initial"
                     animate="animate"

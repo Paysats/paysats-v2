@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/Button"
 import { Form, FormItem } from "@/components/ui/Form"
 import { Input } from "@/components/ui/Input"
 import { AppLayout } from "@/layouts/AppLayout"
-import { NETWORK_PROVIDERS, NetworkProviderEnum } from "@/utils/networkProviders"
+import { NETWORK_PROVIDERS } from "@/utils/networkProviders"
 import { Bitcoin, PhoneCall } from "lucide-react"
 import { useState, type FC } from "react"
 import { TbCurrencyNaira } from "react-icons/tb";
 import { MotionDiv } from "@/components/ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig"
+import { NetworkProviderEnum } from "@shared/types/network-provider.types"
 
 interface AirtimeFormProps {
     handleContinue?: (data: any) => void;
@@ -39,7 +40,7 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                 animate="animate"
             >
                 <MotionDiv className="flex flex-col gap-2" variants={staggerItemVariants}>
-                    <h2 className="text-3xl md:text-4xl font-bold">
+                    <h2 className="text-2xl md:text-4xl font-bold">
                         Buy Airtime
                     </h2>
                     <p className="text-sm text-muted-foreground">
@@ -51,7 +52,7 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                     form={form}
                     onFinish={onFinish}
                     layout="vertical"
-                    className="flex flex-col gap-1"
+                    className="flex flex-col"
                 >
                     {/* select network */}
                     <MotionDiv className="flex flex-col gap-4 mt-1" variants={staggerItemVariants}>
@@ -79,10 +80,10 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                                                             form.setFieldValue('network', provider.name);
                                                         }
                                                     }
-                                                    className={`w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 p-2 rounded-lg ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
+                                                    className={`w-14 md:w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 px-2 md:p-2 rounded-sm ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
                                                 >
-                                                    <img src={provider.logo} alt={provider.name} className="w-10 h-10" />
-                                                    <b>{provider.name}</b>
+                                                    <img src={provider.logo} alt={provider.name} className="w-6 h-6 md:w-10 md:h-10" />
+                                                    <p className="font-medium text-xs">{provider.name}</p>
                                                 </button>
                                             </MotionDiv>
                                         )
@@ -96,8 +97,7 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                     <MotionDiv variants={staggerItemVariants}>
                         <FormItem
                             name="phoneNumber"
-                            label={<span className="font-medium text-base">Phone Number</span>}
-                            className="mb-2"
+                            label={<span className="font-medium">Phone Number</span>}
                             rules={[
                                 { required: true, message: "Phone number is required" },
                                 {
@@ -116,10 +116,10 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                             />
                         </FormItem>
                     </MotionDiv>
-                    <MotionDiv className="mb-2 flex flex-col gap-1" variants={staggerItemVariants}>
+                    <MotionDiv className="flex flex-col gap-1" variants={staggerItemVariants}>
                         <FormItem
                             name="amount"
-                            label={<span className="font-medium text-base">Amount (NGN)</span>}
+                            label={<span className="font-medium">Amount (NGN)</span>}
                             rules={[
                                 { required: true, message: 'Please enter an amount' },
                                 { pattern: /^[0-9]+$/, message: 'Amount must be a number' }
@@ -132,8 +132,10 @@ export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
                             />
                         </FormItem>
                     </MotionDiv>
-                    <MotionDiv className="flex items-end justify-end -mt-4" variants={staggerItemVariants}>
-                        <p className="text-base text-muted-foreground flex">{amount || '100'} NGN = 0.01 <Bitcoin className="text-primary -rotate-10" size={20} /></p>
+                    <MotionDiv className="flex items-end justify-end -mt-8" variants={staggerItemVariants}>
+                        <p className="text-base text-muted-foreground flex">
+                                                        {amount || '0'} NGN = {amount ? (Number(amount) / 10000).toFixed(4) : '0.0000'} <Bitcoin className="text-primary -rotate-10" size={20} />
+                            </p>
                     </MotionDiv>
                     <MotionDiv variants={staggerItemVariants}>
                         <Button fullWidth size="lg" htmlType="submit" disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork}>

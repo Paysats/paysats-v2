@@ -49,8 +49,8 @@ const ServiceTabs = () => {
     const [hoveredTab, setHoveredTab] = useState<string | null>(null);
 
     return (
-        <div className="w-full md:max-w-5xl mx-auto flex items-center gap-4 overflow-x-auto pb-2 px-4 no-scrollbar">
-            <div className="flex items-center gap-2 md:gap-4 mx-auto">
+        <div className="w-full md:max-w-5xl mx-auto flex items-center gap-2 md:gap-4 overflow-x-auto pb-2 px-2 md:px-4 no-scrollbar">
+            <div className="grid grid-cols-3 md:flex md:items-center gap-1 md:gap-4 mx-auto">
                 {
                     SERVICE_ITEMS.map((item) => {
                         const isActive = activeRoute === item.route;
@@ -58,9 +58,13 @@ const ServiceTabs = () => {
                             <Link
                                 to={`/${item.route}`}
                                 key={item.name}
-                                className="relative flex flex-col items-center gap-2 font-medium py-3 px-4 md:px-6 rounded-md transition-colors"
+                                className={cn(
+                                    "relative flex flex-col items-center gap-1 md:gap-2 font-medium py-2 md:py-3 px-2 md:px-6 rounded-md transition-colors min-w-[64px] md:min-w-[96px]",
+                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                                )}
                                 onMouseEnter={() => setHoveredTab(item.route)}
                                 onMouseLeave={() => setHoveredTab(null)}
+                                tabIndex={0}
                             >
                                 {isActive && (
                                     <MotionDiv
@@ -81,15 +85,18 @@ const ServiceTabs = () => {
                                     />
                                 )}
 
-                                <span className={cn("relative z-10 flex flex-col items-center gap-2", isActive ? "text-primary font-bold" : "text-muted-foreground")}>
+                                <span className={cn(
+                                    "relative z-10 flex flex-col items-center gap-1 md:gap-2",
+                                    isActive ? "text-primary font-bold" : "text-muted-foreground"
+                                )}>
                                     <item.icon size={20} className={isActive ? "stroke-[2.5]" : "stroke-2"} />
-                                    <span className="text-xs md:text-sm whitespace-nowrap">{item.name}</span>
+                                    <span className="text-[10px] md:text-xs whitespace-nowrap text-center">{item.name}</span>
                                 </span>
 
                                 {isActive && (
                                     <MotionDiv
                                         layoutId="activeIndicator"
-                                        className="absolute bottom-0 w-8 h-1 bg-primary rounded-full"
+                                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 md:w-8 h-1 bg-primary rounded-full"
                                         transition={springConfigs.smooth}
                                     />
                                 )}

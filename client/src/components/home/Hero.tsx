@@ -13,7 +13,7 @@ export const Hero: FC = () => {
             animate="animate"
         >
             <MotionH1
-                className="text-5xl md:text-7xl font-extrabold text-foreground mb-4 tracking-tight"
+                className="text-4xl md:text-6xl font-extrabold text-foreground mb-4 tracking-tight"
                 variants={staggerItemVariants}
             >
                 Your everyday with <br />

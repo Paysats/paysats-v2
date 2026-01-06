@@ -21,7 +21,7 @@ const ICON_MAP: Record<string, LucideIcon | IconType> = {
 export const ServiceGrid: FC = () => {
     return (
         <MotionDiv
-            className="flex flex-wrap justify-center gap-6 md:gap-10 py-12"
+            className="flex flex-wrap justify-center gap-6 md:gap-10 pt-8 md:py-12"
             variants={staggerContainerVariants}
             initial="initial"
             animate="animate"

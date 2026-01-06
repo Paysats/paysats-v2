@@ -15,7 +15,7 @@ const ComingSoonService: React.FC<IComingSoonServiceProps> = ({ serviceName, mai
     return (
         <AppLayout serviceTabs={false}>
             <main className="flex-grow flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-4 text-center">
-                <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center mb-8">
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary/10 flex items-center justify-center mb-8">
                     {
                         (() => {
                             const Icon = SERVICE_ITEMS.find(item => item.route === serviceName.toLowerCase())?.icon;
@@ -32,11 +32,11 @@ const ComingSoonService: React.FC<IComingSoonServiceProps> = ({ serviceName, mai
                     {serviceName.toLowerCase() === "electricity" ? "Electricity Bills" : serviceName}
                 </h2>
 
-                <p className="text-muted-foreground text-lg mb-4 max-w-md mx-auto">
+                <p className="text-muted-foreground text-base md:text-lg mb-2 md:mb-4 max-w-md mx-auto">
                     {mainText || `Coming soon — pay for ${serviceName} with BCH.`}
                 </p>
 
-                <p className="text-muted-foreground text-base mb-10 max-w-md mx-auto">
+                <p className="text-muted-foreground text-sm md:text-base mb-10 max-w-md mx-auto">
                     {subText || `We are working hard to bring this service to Paysats.`}
                 </p>
 

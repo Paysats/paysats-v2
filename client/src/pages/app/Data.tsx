@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/Button"
 import { Form, FormItem } from "@/components/ui/Form"
 import { Input, SearchInput } from "@/components/ui/Input"
 import { Modal } from "@/components/ui/Modal"
-import { NETWORK_PROVIDERS, NetworkProviderEnum } from "@/utils/networkProviders"
+import { NETWORK_PROVIDERS } from "@/utils/networkProviders"
+import { NetworkProviderEnum } from "@shared/types/network-provider.types"
 import { DATA_PLANS } from "@/utils/dataPlans"
 import type { DataPlanVariation } from "@/utils/dataPlans"
 import { Bitcoin, PhoneCall, ChevronRight, Wifi } from "lucide-react"
 import { TbCurrencyNaira } from "react-icons/tb"
 import { MotionDiv } from "@/components/ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants, cardHoverVariants } from "@/config/animationConfig"
-
+import { toast } from "react-next-toast"
 interface DataFormProps {
     handleContinue?: (data: any) => void;
 }
@@ -53,6 +54,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
         setIsPlanModalOpen(false);
     };
 
+
     return (
         <AppLayout>
             <MotionDiv
@@ -62,7 +64,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                 animate="animate"
             >
                 <MotionDiv variants={staggerItemVariants}>
-                    <h2 className="text-3xl md:text-4xl font-bold">
+                    <h2 className="text-2xl md:text-4xl font-bold">
                         Buy Data
                     </h2>
                     <p className="text-sm text-muted-foreground">
@@ -70,11 +72,12 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                     </p>
                 </MotionDiv>
 
+
                 <Form
                     form={form}
                     onFinish={onFinish}
                     layout="vertical"
-                    className="flex flex-col gap-1 mt-6"
+                    className="flex flex-col"
                 >
                     {/* select network */}
                     <MotionDiv className="flex flex-col gap-4 mb-4 mt-2" variants={staggerItemVariants}>
@@ -103,10 +106,10 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                                                         form.setFieldValue('plan', undefined);
                                                         form.setFieldValue('amount', undefined);
                                                     }}
-                                                    className={`w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 p-2 rounded-lg ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
+                                                                                                        className={`w-14 md:w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 px-2 md:p-2 rounded-sm ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
                                                 >
-                                                    <img src={provider.logo} alt={provider.name} className="w-10 h-10 object-contain" />
-                                                    <b>{provider.name}</b>
+                                                    <img src={provider.logo} alt={provider.name} className="w-6 h-6 md:w-10 md:h-10" />
+                                                    <p className="font-medium text-xs">{provider.name}</p>
                                                 </button>
                                             </MotionDiv>
                                         )
@@ -119,7 +122,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                     <MotionDiv variants={staggerItemVariants}>
                         <FormItem
                             name="phoneNumber"
-                            label={<span className="font-medium text-base">Phone Number</span>}
+                            label={<span className="font-medium">Phone Number</span>}
                             rules={[
                                 { required: true, message: "Phone number is required" },
                                 { pattern: /^[0-9]{11}$/, message: "Phone number must be 11 digits" }
@@ -136,7 +139,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                     <MotionDiv variants={staggerItemVariants}>
                         <FormItem
                             name="plan"
-                            label={<span className="font-medium text-base">Select Data Plan</span>}
+                            label={<span className="font-medium">Select Data Plan</span>}
                             rules={[{ required: true, message: 'Please select a data plan' }]}
                         >
                             <MotionDiv
@@ -164,7 +167,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                         <MotionDiv variants={staggerItemVariants}>
                             <FormItem
                                 name="amount"
-                                label={<span className="font-medium text-base">Amount (NGN)</span>}
+                                label={<span className="font-medium">Amount (NGN)</span>}
                             >
                                 <Input
                                     disabled
@@ -175,8 +178,8 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                         </MotionDiv>
                     )}
 
-                    <MotionDiv className="flex items-end justify-end mt-2 mb-6" variants={staggerItemVariants}>
-                        <p className="text-base text-muted-foreground flex items-center gap-1">
+                    <MotionDiv className="flex items-end justify-end -mt-6" variants={staggerItemVariants}>
+                        <p className="text-base text-muted-foreground flex items-center">
                             {amount || '0'} NGN = {amount ? (Number(amount) / 10000).toFixed(4) : '0.0000'} <Bitcoin className="text-primary -rotate-10" size={20} />
                         </p>
                     </MotionDiv>
