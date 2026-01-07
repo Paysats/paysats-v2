@@ -7,11 +7,13 @@ import { CableTVSubscriptions } from "@/pages/app/CableTVSubscriptions";
 import { HotelBookings } from "@/pages/app/HotelBookings";
 import DataWithPaymentFlow from "@/pages/app/DataPayment";
 import { AirtimePayment } from "@/pages/app/AirtimePayment";
+import { Support } from "@/pages/app/Support";
 
 export function MarketingRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Homepage />} />
+            <Route path="/support" element={<Support />} />
       {/* TODO: remove and leave strictly in app routes when moving to prod */}
       <Route path="/airtime" element={<AirtimePayment />} />
       <Route path="/data" element={<DataWithPaymentFlow />} />

@@ -88,7 +88,7 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
 
                 >
 
-                    <span className="text-primary font-bold text-lg">paysats.xyz</span>
+                    <span className="text-primary font-bold text-lg">paysats.io</span>
                     <span className="text-muted-foreground text-sm">
                         Your everyday with Bitcoin Cash
                     </span>
