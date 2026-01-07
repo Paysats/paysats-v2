@@ -1,4 +1,4 @@
-import { NetworkProviderEnum } from "./networkProviders";
+import { NetworkProviderEnum } from "@shared/types/network-provider.types"
 
 export interface DataPlanVariation {
     variation_code: string;
