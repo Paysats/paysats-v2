@@ -12,9 +12,9 @@ import { Bitcoin, PhoneCall, ChevronRight, Wifi } from "lucide-react"
 import { TbCurrencyNaira } from "react-icons/tb"
 import { MotionDiv } from "@/components/ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants, cardHoverVariants } from "@/config/animationConfig"
-import { toast } from "react-next-toast"
+
 interface DataFormProps {
-    handleContinue?: (data: any) => void;
+    handleContinue: (data: any) => void;
 }
 
 export const Data:FC<DataFormProps> = ({ handleContinue }) => {
@@ -44,7 +44,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
             plan: selectedPlan
         };
         console.log("Data Order ====> ", data);
-        handleContinue?.(data);
+        handleContinue(data);
     };
 
     const handlePlanSelect = (plan: DataPlanVariation) => {

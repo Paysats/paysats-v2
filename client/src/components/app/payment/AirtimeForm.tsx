@@ -12,22 +12,20 @@ import { staggerContainerVariants, staggerItemVariants } from "@/config/animatio
 import { NetworkProviderEnum } from "@shared/types/network-provider.types"
 
 interface AirtimeFormProps {
-    handleContinue?: (data: any) => void;
+    handleContinue: (data: any) => void;
 }
 
-export const Airtime:FC<AirtimeFormProps> = ({ handleContinue }) => {
+export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const amount = Form.useWatch('amount', form);
 
     const onFinish = (values: any) => {
-        console.log('Form values:', values);
         const data = {
             ...values,
             network: selectedNetwork
         }
-        console.log("Data ====> ", data)
-        handleContinue?.(data);
+        handleContinue(data);
     };
 
     return (
