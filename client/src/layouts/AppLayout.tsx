@@ -22,7 +22,7 @@ export const AppLayout = ({ children, serviceTabs = true }: AppLayoutProps) => {
             }
             <AnimatePresence mode="wait">
                 <MotionMain
-                    className="w-full md:max-w-3xl h-full mx-auto flex-grow flex flex-col gap-8 px-4 overflow-auto "
+                    className="w-full md:max-w-3xl h-full  mx-auto  flex flex-col gap-8 px-4 overflow-auto"
                     variants={pageTransitionVariants}
                     initial="initial"
                     animate="animate"
