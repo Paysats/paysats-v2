@@ -10,7 +10,7 @@ import { buttonVariants, buttonGlowVariants, springConfigs } from "@/config/anim
 const MotionAntButton = motion(AntButton) as any;
 
 const buttonStyles = cva(
-  "!bg-transparent !shadow-none !flex !items-center !rounded !justify-center !gap-2 !font-medium !transition-colors focus:!outline-none focus:!ring-2 focus:ring-ring focus-visible:outline-hidden focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "!bg-transparent !shadow-none !flex !items-center !rounded-sm !justify-center !gap-2 !font-medium !transition-colors focus:!outline-none focus:!ring-2 focus:ring-ring focus-visible:outline-hidden focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
