@@ -178,16 +178,33 @@ export class PromptCashService {
 
     /**
      * Verify webhook signature
+     * Checks if the callback request includes Your-Secret-Account-Token 
+     * under the JSON root key "token" to prevent spoofing
      */
-    static verifyWebhookSignature(payload: IPromptCashPayment): boolean {
+    static verifyWebhookSignature(payload: any): boolean {
         if (!PROMPT_CASH_SECRET_TOKEN) {
             logger.warn('PROMPT_CASH_SECRET_TOKEN not configured, skipping webhook verification');
-            return true; // Allow in development, but warn
+            return false; // Reject if no secret configured (security fix)
         }
 
-        // Check if the token in the payload matches our secret token
-        const tokenInPayload = (payload as any).token;
-        return tokenInPayload === PROMPT_CASH_SECRET_TOKEN;
+        // Check if the token in the payload matches our secret token (root level)
+        const tokenInPayload = payload.token;
+        
+        if (!tokenInPayload) {
+            logger.error('Missing token in webhook payload');
+            return false;
+        }
+
+        const isValid = tokenInPayload === PROMPT_CASH_SECRET_TOKEN;
+        
+        if (!isValid) {
+            logger.error('Token mismatch in webhook payload', {
+                receivedToken: tokenInPayload?.substring(0, 10) + '...',
+                expectedToken: PROMPT_CASH_SECRET_TOKEN?.substring(0, 10) + '...'
+            });
+        }
+
+        return isValid;
     }
 
     /**
