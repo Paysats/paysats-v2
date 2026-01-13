@@ -15,11 +15,13 @@ export interface PaymentQRData {
 
 interface PaymentQRProps {
     data: PaymentQRData;
+    qrUrl?: string; // QR code URL from API
+    paymentLink?: string; // Payment link from API
     onCancel?: () => void;
     loading?: boolean;
 }
 
-export const PaymentQR = ({ data, onCancel, loading = false }: PaymentQRProps) => {
+export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, loading = false }: PaymentQRProps) => {
     const { bchAddress, bchAmount, amountUSD, paymentFor } = data;
     const [copied, setCopied] = useState(false);
 
@@ -57,12 +59,22 @@ export const PaymentQR = ({ data, onCancel, loading = false }: PaymentQRProps) =
                 className="p-6 bg-white rounded-2xl shadow-lg border-4 border-primary"
             >
                 <div className="bg-primary/5 p-4 rounded-xl">
-                    <QRCode
-                        value={`bitcoincash:${bchAddress}?amount=${bchAmount}`}
-                        size={200}
-                        level="H"
-                        className="w-full h-auto"
-                    />
+                    {qrUrl ? (
+                        // Use QR image from Prompt.cash API
+                        <img 
+                            src={qrUrl} 
+                            alt="Payment QR Code" 
+                            className="w-50 h-50"
+                        />
+                    ) : (
+                        // Fallback to generated QR code
+                        <QRCode
+                            value={`bitcoincash:${bchAddress}?amount=${bchAmount}`}
+                            size={200}
+                            level="H"
+                            className="w-full h-auto"
+                        />
+                    )}
                 </div>
             </MotionDiv>
 
@@ -106,6 +118,20 @@ export const PaymentQR = ({ data, onCancel, loading = false }: PaymentQRProps) =
                     WAITING FOR PAYMENT...
                 </span>
             </MotionDiv>
+
+            {/* Payment Link Button */}
+            {paymentLink && (
+                <MotionDiv variants={staggerItemVariants} className="w-full">
+                    <Button
+                        fullWidth
+                        variant="outline"
+                        onClick={() => window.open(paymentLink, '_blank')}
+                        className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
+                        Open in Bitcoin Wallet
+                    </Button>
+                </MotionDiv>
+            )}
 
             {onCancel && (
                 <MotionDiv variants={staggerItemVariants} className="mt-4">

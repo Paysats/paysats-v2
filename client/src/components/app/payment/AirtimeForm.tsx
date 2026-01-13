@@ -5,25 +5,62 @@ import { Input } from "@/components/ui/Input"
 import { AppLayout } from "@/layouts/AppLayout"
 import { NETWORK_PROVIDERS } from "@/utils/networkProviders"
 import { Bitcoin, PhoneCall } from "lucide-react"
-import { useState, type FC } from "react"
+import { useState, useEffect, type FC } from "react"
 import { TbCurrencyNaira } from "react-icons/tb";
 import { MotionDiv } from "@/components/ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig"
 import { NetworkProviderEnum } from "@shared/types/network-provider.types"
+import { rateService } from "@/api/services/rate.service"
+import { Spin } from "antd"
 
 interface AirtimeFormProps {
     handleContinue: (data: any) => void;
+    loading?: boolean;
 }
 
-export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue }) => {
+export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = false }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const amount = Form.useWatch('amount', form);
+    const [bchAmount, setBchAmount] = useState<number>(0);
+    const [convertingRate, setConvertingRate] = useState<boolean>(false);
+    const [conversionError, setConversionError] = useState<string | null>(null);
+
+    // Real-time conversion effect
+    useEffect(() => {
+        const convertAmount = async () => {
+            if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+                setBchAmount(0);
+                setConversionError(null);
+                return;
+            }
+
+            setConvertingRate(true);
+            setConversionError(null);
+
+            try {
+                const result = await rateService.convertNGNToBCH(Number(amount));
+                
+                setBchAmount(result.bch);
+            } catch (error) {
+                console.error('Error converting amount:', error);
+                setConversionError('Unable to fetch rate');
+                setBchAmount(0);
+            } finally {
+                setConvertingRate(false);
+            }
+        };
+
+        // Debounce the conversion to avoid too many API calls
+        const timeoutId = setTimeout(convertAmount, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [amount]);
 
     const onFinish = (values: any) => {
         const data = {
             ...values,
-            network: selectedNetwork
+            network: selectedNetwork?.toLowerCase()
         }
         handleContinue(data);
     };
@@ -131,13 +168,29 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue }) => {
                         </FormItem>
                     </MotionDiv>
                     <MotionDiv className="flex items-end justify-end -mt-8" variants={staggerItemVariants}>
-                        <p className="text-base text-muted-foreground flex">
-                                                        {amount || '0'} NGN = {amount ? (Number(amount) / 10000).toFixed(4) : '0.0000'} <Bitcoin className="text-primary -rotate-10" size={20} />
-                            </p>
+                        <p className="text-base text-muted-foreground flex items-center gap-1">
+                            {amount || '0'} NGN = 
+                            {convertingRate ? (
+                                <Spin size="small" className="mx-1" />
+                            ) : conversionError ? (
+                                <span className="text-red-500 text-xs mx-1">{conversionError}</span>
+                            ) : (
+                                <span className="font-semibold text-foreground mx-1">
+                                    {bchAmount.toFixed(8)} BCH
+                                </span>
+                            )}
+                            <Bitcoin className="text-primary -rotate-10" size={20} />
+                        </p>
                     </MotionDiv>
                     <MotionDiv variants={staggerItemVariants}>
-                        <Button fullWidth size="lg" htmlType="submit" disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork}>
-                            Continue
+                        <Button 
+                            fullWidth 
+                            size="lg" 
+                            htmlType="submit" 
+                            loading={loading}
+                            disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork || loading}
+                        >
+                            {loading ? 'Creating Transaction...' : 'Continue'}
                         </Button>
                     </MotionDiv>
                 </Form>

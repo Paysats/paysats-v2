@@ -11,6 +11,8 @@ export interface PaymentSuccessData {
     amount: number;
     bchAmount: number;
     transactionId?: string;
+    transactionReference?: string;
+    date?: string;
 }
 
 interface PaymentSuccessProps {
