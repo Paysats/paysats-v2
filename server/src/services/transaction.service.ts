@@ -8,9 +8,10 @@ import { VtPassService } from './vtpass.service';
 import { CacheService, CACHE_KEYS, CACHE_TTL } from './cache.service';
 import logger from '@/utils/logger';
 import mongoose from 'mongoose';
+import { config } from '@/config/config';
 
-const APP_BASE_URL = process.env.APP_BASE_URL || 'https://app.paysats.io';
-const API_BASE_URL = process.env.API_BASE_URL || 'https://api.paysats.io';
+const APP_BASE_URL = config.app.APP_BASE_URL || 'https://app.paysats.io';
+const API_BASE_URL = config.app.API_BASE_URL || 'https://api.paysats.io';
 
 export interface ICreateAirtimeTransactionParams {
     network: string;
@@ -144,7 +145,7 @@ export class TransactionService {
         }
     }
 
-    static async handlePaymentConfirmation(reference: string, webhookPayload: any) {
+    static async handlePaymentConfirmation(reference: string, paymentData: any) {
         const session = await mongoose.startSession();
         session.startTransaction();
 
@@ -159,20 +160,27 @@ export class TransactionService {
                 throw new Error(`Payment not found for transaction: ${reference}`);
             }
 
-            const internalStatus = PromptCashService.mapStatus(webhookPayload.status);
+            const internalStatus = PromptCashService.mapStatus(paymentData.status);
             
             payment.status = internalStatus as PaymentStatusEnum;
-            payment.txHash = webhookPayload.hash || payment.txHash;
-            payment.confirmations = webhookPayload.confirmations || 0;
-            payment.rawBlockchainPayload = webhookPayload;
+            payment.txHash = paymentData.hash || payment.txHash;
+            payment.confirmations = paymentData.confirmations || 0;
+            payment.rawBlockchainPayload = paymentData;
             await payment.save({ session });
 
-            if (webhookPayload.status === 'PAID') {
-                transaction.status = TransactionStatusEnum.PAYMENT_CONFIRMED;
-                transaction.paidAt = new Date();
-                await transaction.save({ session });
+            if (paymentData.status === 'PAID') {
+                const trxData = {
+                    status: TransactionStatusEnum.PAYMENT_CONFIRMED,
+                    paidAt: new Date(),
+                }
 
-                // Invalidate cache so frontend gets fresh status
+                await TransactionModel.findByIdAndUpdate(
+                    transaction._id,
+                    trxData,
+                    { session }
+                );
+
+                // invalid cache so frontend gets fresh status
                 CacheService.invalidateTransaction(reference);
 
                 await this.fulfillService(transaction, session);
@@ -185,7 +193,7 @@ export class TransactionService {
 
             logger.info('Payment confirmation handled successfully', {
                 reference,
-                status: webhookPayload.status,
+                status: paymentData.status,
             });
 
             return transaction;

@@ -26,7 +26,8 @@ const google = {
 const app = {
     NAME: process.env.APP_NAME || "aboutly",
     PORT: process.env.PORT || 4000,
-    BASE_URL: process.env.APP_BASE_URL || `http://localhost:${process.env.APP_PORT || 4000}`,
+    APP_BASE_URL: process.env.APP_BASE_URL || `http://localhost:${process.env.APP_PORT || 4000}`,
+    API_BASE_URL: process.env.API_BASE_URL || `http://localhost:${process.env.APP_PORT || 4000}/api`,
     FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
     CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3000",
 }

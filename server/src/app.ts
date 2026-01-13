@@ -4,6 +4,7 @@ import { RateLimitMiddleware } from "./middlewares/rateLimit.middleware"
 // routes
 import healthRoutes from "./routes/health.routes"
 import paymentRoutes from "./routes/payment.routes"
+import webhookRoutes from "./routes/webhook.routes"
 import rateRoutes from "./routes/rate.routes"
 
 import { connectDatabase } from "./config/database"
@@ -45,6 +46,8 @@ app.use("/api/v1/payments", paymentRoutes);
 // rate conversion routes
 app.use("/api/v1/rates", rateRoutes);
 
+// webhook routes (no auth required)
+app.use("/webhooks", webhookRoutes);
 
 // Root endpoint
 app.get('/', (_req, res) => {

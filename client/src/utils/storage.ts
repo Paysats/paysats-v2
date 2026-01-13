@@ -89,4 +89,9 @@ export const STORAGE_KEYS = {
   // App Preferences
   THEME: 'paysats_theme',
   USER_PREFERENCES: 'paysats_user_preferences',
+
+  // Payment Sessions
+  PAYMENT_SESSION_AIRTIME: 'paysats_payment_session_airtime',
+  PAYMENT_SESSION_DATA: 'paysats_payment_session_data',
+  PAYMENT_SESSION_BILLS: 'paysats_payment_session_bills',
 } as const;
