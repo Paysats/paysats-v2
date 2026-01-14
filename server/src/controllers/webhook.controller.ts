@@ -7,6 +7,8 @@ import logger from '@/utils/logger';
  * Handle Prompt.cash webhook callbacks
  */
 export const handlePromptCashWebhook = async (req: Request, res: Response) => {
+    const webhookReceivedAt = Date.now();
+    
     try {
         const webhookPayload = req.body;
         const paymentData = webhookPayload.payment;
@@ -14,6 +16,9 @@ export const handlePromptCashWebhook = async (req: Request, res: Response) => {
         logger.info('Received Prompt.cash webhook', {
             tx_id: paymentData?.tx_id,
             status: paymentData?.status,
+            paid_at: paymentData?.paid,
+            confirmations: paymentData?.confirmations,
+            webhook_received_at: new Date(webhookReceivedAt).toISOString(),
         });
 
         // 1. Verify webhook signature (token is at root level)
@@ -32,6 +37,13 @@ export const handlePromptCashWebhook = async (req: Request, res: Response) => {
 
         // 3. Handle payment confirmation (pass the payment object)
         await TransactionService.handlePaymentConfirmation(reference, paymentData);
+
+        // 4. Log webhook processing time
+        const processingTime = Date.now() - webhookReceivedAt;
+        logger.info('Webhook processed successfully', {
+            tx_id: reference,
+            processing_time_ms: processingTime,
+        });
 
         // 4. Return success
         res.status(200).json({ success: true });

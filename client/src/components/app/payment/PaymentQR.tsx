@@ -18,12 +18,14 @@ interface PaymentQRProps {
     qrUrl?: string; // QR code URL from API
     paymentLink?: string; // Payment link from API
     onCancel?: () => void;
+    onManualCheck?: () => Promise<void>; // Manual status check callback
     loading?: boolean;
 }
 
-export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, loading = false }: PaymentQRProps) => {
+export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, onManualCheck, loading = false }: PaymentQRProps) => {
     const { bchAddress, bchAmount, amountUSD, paymentFor } = data;
-    const [copied, setCopied] = useState(false);
+    const [copied, setCopied] = useState<boolean>(false);
+    const [checking, setChecking] = useState<boolean>(false);
 
     const copyToClipboard = async () => {
         try {
@@ -33,6 +35,19 @@ export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, loading = false 
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             toast.error('Failed to copy address');
+        }
+    };
+
+    const handleManualCheck = async () => {
+        if (!onManualCheck) return;
+        
+        setChecking(true);
+        try {
+            await onManualCheck();
+        } catch (error) {
+            toast.error('Failed to check payment status');
+        } finally {
+            setChecking(false);
         }
     };
 
@@ -120,21 +135,45 @@ export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, loading = false 
             </MotionDiv>
 
             {/* Payment Link Button */}
-            {paymentLink && (
+            <MotionDiv variants={staggerItemVariants} className="w-full">
+                <Button
+                    fullWidth
+                    variant="outline"
+                    onClick={() => {
+                        // Create proper BCH URI with amount
+                        const bchUri = `bitcoincash:${bchAddress}?amount=${bchAmount}`;
+                        window.location.href = bchUri;
+                    }}
+                    className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                    Open in Bitcoin Wallet
+                </Button>
+            </MotionDiv>
+
+            {/* Manual Check Button */}
+            {onManualCheck && (
                 <MotionDiv variants={staggerItemVariants} className="w-full">
                     <Button
                         fullWidth
-                        variant="outline"
-                        onClick={() => window.open(paymentLink, '_blank')}
-                        className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                        variant="ghost"
+                        onClick={handleManualCheck}
+                        disabled={checking}
+                        className="text-sm"
                     >
-                        Open in Bitcoin Wallet
+                        {checking ? (
+                            <>
+                                <Loader2 className="animate-spin mr-2" size={14} />
+                                Checking...
+                            </>
+                        ) : (
+                            'Already Paid? Check Status'
+                        )}
                     </Button>
                 </MotionDiv>
             )}
 
             {onCancel && (
-                <MotionDiv variants={staggerItemVariants} className="mt-4">
+                <MotionDiv variants={staggerItemVariants} className="mt-2">
                     <Button 
                         variant="ghost"
                         onClick={onCancel}

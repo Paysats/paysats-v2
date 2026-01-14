@@ -85,8 +85,8 @@ export class TransactionService {
                 desc: `Paysats Airtime - ${params.network} - ${params.phoneNumber}`,
                 callback: `${API_BASE_URL}/webhooks/promptcash`,
                 return: `${APP_BASE_URL}/app/transaction/${reference}`,
-                expiration: 30,
-                confirm: 0,
+                expiration: 5, // 5 minutes (custom expiration)
+                confirm: 0, // Accept 0-conf (instant) payments
             });
 
             const payment = await PaymentModel.create([{

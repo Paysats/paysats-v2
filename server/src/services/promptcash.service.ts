@@ -80,7 +80,7 @@ export class PromptCashService {
                 desc: params.desc,
                 callback: params.callback,
                 return: params.return,
-                expiration: params.expiration || 30,
+                expiration: params.expiration || 30, // 30 minutes prompt cash default
                 confirm: params.confirm || 0,
                 time,
             };
