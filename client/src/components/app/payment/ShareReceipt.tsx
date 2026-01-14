@@ -13,16 +13,20 @@ export interface ShareReceiptData {
     amount: number;
     bchAmount: number;
     icon?: React.ReactNode;
+    transactionReference?: string;
+    date?: string;
+    phoneNumber?: string;
 }
 
 interface ShareReceiptProps {
     data: ShareReceiptData;
-    onDownload?: () => void;
+    onDownload?: () => void | Promise<void>;
 }
 
 export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
-    const { title, serviceProvider, amount, bchAmount, icon } = data;
+    const { title, serviceProvider, amount, bchAmount } = data;
     const [copied, setCopied] = useState<boolean>(false);
+    const [downloading, setDownloading] = useState<boolean>(false);
 
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
@@ -34,6 +38,19 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             toast.error('Failed to copy link');
+        }
+    };
+
+    const handleDownload = async () => {
+        if (!onDownload) return;
+        
+        setDownloading(true);
+        try {
+            await onDownload();
+        } catch (error) {
+            console.error('Download error:', error);
+        } finally {
+            setDownloading(false);
         }
     };
 
@@ -103,11 +120,12 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
                     <Button
                         variant="default"
                         fullWidth
-                        onClick={onDownload}
+                        onClick={handleDownload}
+                        loading={downloading}
                         icon={<Download size={18} />}
                         className="flex-1"
                     >
-                        Download Image
+                        {downloading ? 'Generating...' : 'Download Image'}
                     </Button>
                 )}
                 <Button

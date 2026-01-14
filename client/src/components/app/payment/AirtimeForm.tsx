@@ -26,10 +26,16 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
     const [convertingRate, setConvertingRate] = useState<boolean>(false);
     const [conversionError, setConversionError] = useState<string | null>(null);
 
-    // Real-time conversion effect
+    // noticed an ish.. disabling preview conversion for now to avoid: 
+    // 1. coingecko rate limits (429 errors) - free account for MVP
+    // 2. price inconsistency (CoinGecko vs Prompt.cash)
+    // User will see accurate rate from prompt.cash in Review screen
+    const enablePreviewConversion = false;
+
+    // Real-time conversion effect (disabled by default)
     useEffect(() => {
         const convertAmount = async () => {
-            if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+            if (!amount || isNaN(Number(amount)) || Number(amount) <= 0 || !enablePreviewConversion) {
                 setBchAmount(0);
                 setConversionError(null);
                 return;
@@ -40,7 +46,7 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
 
             try {
                 const result = await rateService.convertNGNToBCH(Number(amount));
-                
+
                 setBchAmount(result.bch);
             } catch (error) {
                 console.error('Error converting amount:', error);
@@ -55,7 +61,7 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
         const timeoutId = setTimeout(convertAmount, 500);
 
         return () => clearTimeout(timeoutId);
-    }, [amount]);
+    }, [amount, enablePreviewConversion]);
 
     const onFinish = (values: any) => {
         const data = {
@@ -167,21 +173,33 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                             />
                         </FormItem>
                     </MotionDiv>
-                    <MotionDiv className="flex items-end justify-end -mt-8" variants={staggerItemVariants}>
-                        <p className="text-base text-muted-foreground flex items-center gap-1">
-                            {amount || '0'} NGN = 
-                            {convertingRate ? (
-                                <Spin size="small" className="mx-1" />
-                            ) : conversionError ? (
-                                <span className="text-red-500 text-xs mx-1">{conversionError}</span>
-                            ) : (
-                                <span className="font-semibold text-foreground mx-1">
-                                    {bchAmount.toFixed(8)} BCH
+                    {enablePreviewConversion && (
+                        <MotionDiv className="flex items-end justify-end -mt-8" variants={staggerItemVariants}>
+                            <p className="text-base text-muted-foreground flex items-center gap-1">
+                                {amount || '0'} NGN = 
+                                {convertingRate ? (
+                                    <Spin size="small" className="mx-1" />
+                                ) : conversionError ? (
+                                    <span className="text-red-500 text-xs mx-1">{conversionError}</span>
+                                ) : (
+                                    <span className="font-semibold text-foreground mx-1">
+                                        {bchAmount.toFixed(8)} BCH
+                                    </span>
+                                )}
+                                <Bitcoin className="text-primary -rotate-10" size={20} />
+                            </p>
+                        </MotionDiv>
+                    )}
+                    {!enablePreviewConversion && amount && Number(amount) > 0 && (
+                        <MotionDiv className="flex items-end justify-end -mt-6" variants={staggerItemVariants}>
+                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Bitcoin className="text-primary -rotate-10" size={16} />
+                                <span className="italic">
+                                    BCH equivalent will be shown in next step
                                 </span>
-                            )}
-                            <Bitcoin className="text-primary -rotate-10" size={20} />
-                        </p>
-                    </MotionDiv>
+                            </p>
+                        </MotionDiv>
+                    )}
                     <MotionDiv variants={staggerItemVariants}>
                         <Button 
                             fullWidth 

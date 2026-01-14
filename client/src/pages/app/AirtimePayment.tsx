@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { PaymentFlowProvider, PaymentStepsEnum, usePaymentFlow } from "@/contexts/PaymentFlowContext";
 import type { PaymentData } from "@/contexts/PaymentFlowContext";
 import { AirtimeForm } from "../../components/app/payment/AirtimeForm";
-import { PaymentReview, PaymentQR, PaymentSuccess, ShareReceipt } from "@/components/app/payment";
-import type { PaymentReviewData, PaymentQRData, PaymentSuccessData, ShareReceiptData } from "@/components/app/payment";
+import { PaymentReview, PaymentQR, PaymentSuccess, ShareReceipt, Receipt } from "@/components/app/payment";
+import type { PaymentReviewData, PaymentQRData, PaymentSuccessData, ShareReceiptData, ReceiptData } from "@/components/app/payment";
 import { transactionService } from "@/api/services/transaction.service";
 import type { Transaction } from "@/api/services/transaction.service";
 import { toast } from "react-next-toast";
 import { isTransactionExpired, isTransactionFinal } from "@/utils/transaction";
+import { toPng } from 'html-to-image';
+import { createRoot } from 'react-dom/client';
 
 const AirtimeFlowContent = () => {
     const { currentStep, paymentData, setStep, setPaymentData, goToNextStep, resetFlow, isRestoringSession } = usePaymentFlow();
@@ -198,9 +200,67 @@ console.log('airtime transaction result ===> :', result);
         setStep(PaymentStepsEnum.SHARE);
     };
 
-    const handleDownloadReceipt = () => {
-        // TODO: implemnt receipt download logic
-        console.log('Download receipt');
+    const handleDownloadReceipt = async () => {
+        if (!paymentData) {
+            toast.error('No payment data available');
+            return;
+        }
+
+        try {
+            toast.info('Generating receipt...');
+
+            const receiptData: ReceiptData = {
+                title: 'Airtime Purchase',
+                serviceName: 'Airtime',
+                serviceProvider: paymentData.serviceProvider?.toUpperCase() || 'N/A',
+                amount: paymentData.amount,
+                bchAmount: paymentData.bchAmount,
+                transactionReference: paymentData.reference,
+                date: transaction?.paidAt ? new Date(transaction.paidAt).toLocaleString() : new Date().toLocaleString(),
+                phoneNumber: paymentData.formData?.phoneNumber,
+            };
+
+            // create temp container
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '-9999px';
+            document.body.appendChild(container);
+
+            // render the receipt component
+            const root = createRoot(container);
+            root.render(<Receipt data={receiptData} />);
+
+            // wait for render
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            const receiptElement = container.querySelector('#receipt-container') as HTMLElement;
+            
+            if (!receiptElement) {
+                throw new Error('Receipt element not found');
+            }
+
+            // Generate image
+            const dataUrl = await toPng(receiptElement, {
+                quality: 1,
+                pixelRatio: 2,
+                backgroundColor: '#ffffff',
+            });
+
+            const link = document.createElement('a');
+            link.download = `paysats-receipt-${paymentData.reference || Date.now()}.png`;
+            link.href = dataUrl;
+            link.click();
+
+            // Cleanup
+            root.unmount();
+            document.body.removeChild(container);
+
+            toast.success('Receipt downloaded successfully!');
+        } catch (error) {
+            console.error('Error downloading receipt:', error);
+            toast.error('Failed to download receipt. Please try again.');
+        }
     };
 
     const handleDone = () => {
@@ -240,6 +300,7 @@ console.log('airtime transaction result ===> :', result);
             bchAmount: paymentData.bchAmount,
             bchRate: paymentData.bchRate,
             paymentFor: paymentData.paymentFor,
+            expiryMinutes: 5, // Custom expiration time (prompt.cash default is 30)
         };
 
         return (
@@ -248,6 +309,7 @@ console.log('airtime transaction result ===> :', result);
                     data={reviewData}
                     onProceed={handleProceedToPayment}
                     onCancel={() => setStep('form')}
+                    loading={loading}
                 />
             </AppLayout>
         );
@@ -269,6 +331,24 @@ console.log('airtime transaction result ===> :', result);
                     data={qrData}
                     qrUrl={paymentData.qrUrl}
                     paymentLink={paymentData.paymentLink}
+                    onManualCheck={async () => {
+                        // Force refresh transaction status
+                        if (!paymentData.reference) return;
+                        
+                        const txn = await transactionService.getTransaction(paymentData.reference);
+                        setTransaction(txn);
+                        
+                        if (txn.status === 'PENDING') {
+                            toast.info('Payment not detected yet. Please wait a moment.');
+                        } else if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
+                            toast.success('Payment detected! Processing your order...');
+                        } else if (txn.status === 'SUCCESS') {
+                            toast.success('Airtime delivered successfully!');
+                            setStep(PaymentStepsEnum.SUCCESS);
+                        } else {
+                            toast.error('Transaction status: ' + txn.status);
+                        }
+                    }}
                     onCancel={() => {
                         if (pollingInterval) {
                             clearInterval(pollingInterval);
@@ -285,7 +365,7 @@ console.log('airtime transaction result ===> :', result);
         const successData: PaymentSuccessData = {
             serviceName: paymentData.serviceName,
             title: "Airtime delivered 🚀",
-            serviceProvider: paymentData.serviceProvider,
+            serviceProvider: paymentData.serviceProvider?.toUpperCase(),
             amount: paymentData.amount,
             bchAmount: paymentData.bchAmount,
             transactionReference: paymentData.reference,
@@ -307,7 +387,7 @@ console.log('airtime transaction result ===> :', result);
     if (currentStep === PaymentStepsEnum.SHARE) {
         const shareData: ShareReceiptData = {
             title: 'Just topped up my airtime with Bitcoin Cash ⚡',
-            serviceProvider: paymentData.serviceProvider,
+            serviceProvider: paymentData.serviceProvider?.toUpperCase(),
             amount: paymentData.amount,
             bchAmount: paymentData.bchAmount,
         };

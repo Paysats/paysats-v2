@@ -9,3 +9,6 @@ export type { PaymentSuccessData } from './PaymentSuccess';
 
 export { ShareReceipt } from './ShareReceipt';
 export type { ShareReceiptData } from './ShareReceipt';
+
+export { Receipt } from './Receipt';
+export type { ReceiptData } from './Receipt';
