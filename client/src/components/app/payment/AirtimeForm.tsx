@@ -18,7 +18,7 @@ interface AirtimeFormProps {
     loading?: boolean;
 }
 
-export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = false }) => {
+export const AirtimeForm: FC<AirtimeFormProps> = ({ handleContinue, loading = false }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const amount = Form.useWatch('amount', form);
@@ -80,7 +80,7 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                 initial="initial"
                 animate="animate"
             >
-                <MotionDiv className="flex flex-col gap-2" variants={staggerItemVariants}>
+                <MotionDiv className="flex flex-col gap-3" variants={staggerItemVariants}>
                     <h2 className="text-2xl md:text-4xl font-bold">
                         Buy Airtime
                     </h2>
@@ -104,7 +104,7 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                             name="network"
                             rules={[{ required: true, message: 'Please select a network' }]}
                         >
-                            <div className="flex items-center gap-4">
+                            <div className="grid grid-cols-4 gap-3 w-full">
                                 {
                                     NETWORK_PROVIDERS?.map((provider) => {
                                         return (
@@ -112,6 +112,7 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                                                 key={provider.name}
                                                 whileHover={{ scale: 1.05, y: -2 }}
                                                 whileTap={{ scale: 0.95 }}
+                                                className="w-full"
                                             >
                                                 <button
                                                     type="button"
@@ -121,10 +122,10 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                                                             form.setFieldValue('network', provider.name);
                                                         }
                                                     }
-                                                    className={`w-14 md:w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 px-2 md:p-2 rounded-sm ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
+                                                    className={`w-full cursor-pointer hover:border-primary transition-all duration-300 flex flex-col border items-center justify-center gap-2 py-3 rounded-2xl ${selectedNetwork === provider.name ? "border-primary border-2 bg-primary/5 shadow-sm" : "border-border bg-card hover:bg-muted/50"}`}
                                                 >
-                                                    <img src={provider.logo} alt={provider.name} className="w-6 h-6 md:w-10 md:h-10" />
-                                                    <p className="font-medium text-xs">{provider.name}</p>
+                                                    <img src={provider.logo} alt={provider.name} className="w-8 h-8 object-contain" />
+                                                    <p className="font-medium text-[10px] md:text-xs">{provider.name}</p>
                                                 </button>
                                             </MotionDiv>
                                         )
@@ -133,7 +134,7 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                             </div>
                         </FormItem>
                     </MotionDiv>
-                    
+
                     {/* form... */}
                     <MotionDiv variants={staggerItemVariants}>
                         <FormItem
@@ -151,9 +152,10 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                                 id="phone-number"
                                 placeholder="0801 234 5678"
                                 suffix={
-                                    <PhoneCall size={18} className="text-gray-400" />
+                                    <PhoneCall size={18} className="text-muted-foreground" />
                                 }
                                 maxLength={11}
+                                className="h-12 text-lg font-medium"
                             />
                         </FormItem>
                     </MotionDiv>
@@ -169,14 +171,15 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                             <Input
                                 id="amount"
                                 placeholder="100"
-                                suffix={<TbCurrencyNaira size={20} className="text-gray-400" />}
+                                suffix={<TbCurrencyNaira size={20} className="text-muted-foreground" />}
+                                className="h-12 text-lg font-medium"
                             />
                         </FormItem>
                     </MotionDiv>
                     {enablePreviewConversion && (
                         <MotionDiv className="flex items-end justify-end -mt-8" variants={staggerItemVariants}>
                             <p className="text-base text-muted-foreground flex items-center gap-1">
-                                {amount || '0'} NGN = 
+                                {amount || '0'} NGN =
                                 {convertingRate ? (
                                     <Spin size="small" className="mx-1" />
                                 ) : conversionError ? (
@@ -201,10 +204,10 @@ export const AirtimeForm:FC<AirtimeFormProps> = ({ handleContinue, loading = fal
                         </MotionDiv>
                     )}
                     <MotionDiv variants={staggerItemVariants}>
-                        <Button 
-                            fullWidth 
-                            size="lg" 
-                            htmlType="submit" 
+                        <Button
+                            fullWidth
+                            size="lg"
+                            htmlType="submit"
                             loading={loading}
                             disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork || loading}
                         >

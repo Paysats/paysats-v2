@@ -17,7 +17,7 @@ interface DataFormProps {
     handleContinue: (data: any) => void;
 }
 
-export const Data:FC<DataFormProps> = ({ handleContinue }) => {
+export const Data: FC<DataFormProps> = ({ handleContinue }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
@@ -88,7 +88,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                             name="network"
                             rules={[{ required: true, message: 'Please select a network' }]}
                         >
-                            <div className="flex items-center gap-4">
+                            <div className="grid grid-cols-4 gap-3 w-full">
                                 {
                                     NETWORK_PROVIDERS?.map((provider) => {
                                         return (
@@ -96,6 +96,7 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                                                 key={provider.name}
                                                 whileHover={{ scale: 1.05, y: -2 }}
                                                 whileTap={{ scale: 0.95 }}
+                                                className="w-full"
                                             >
                                                 <button
                                                     type="button"
@@ -106,10 +107,10 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                                                         form.setFieldValue('plan', undefined);
                                                         form.setFieldValue('amount', undefined);
                                                     }}
-                                                                                                        className={`w-14 md:w-24 cursor-pointer hover:border-primary transition-colors flex flex-col border border-gray-300 items-center gap-2 px-2 md:p-2 rounded-sm ${selectedNetwork === provider.name ? "border-primary border-2" : ""}`}
+                                                    className={`w-full cursor-pointer hover:border-primary transition-all duration-300 flex flex-col border items-center justify-center gap-2 py-3 rounded-2xl ${selectedNetwork === provider.name ? "border-primary border-2 bg-primary/5 shadow-sm" : "border-border bg-card hover:bg-muted/50"}`}
                                                 >
-                                                    <img src={provider.logo} alt={provider.name} className="w-6 h-6 md:w-10 md:h-10" />
-                                                    <p className="font-medium text-xs">{provider.name}</p>
+                                                    <img src={provider.logo} alt={provider.name} className="w-8 h-8 object-contain" />
+                                                    <p className="font-medium text-[10px] md:text-xs">{provider.name}</p>
                                                 </button>
                                             </MotionDiv>
                                         )
@@ -130,8 +131,9 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                         >
                             <Input
                                 placeholder="0801 234 5678"
-                                suffix={<PhoneCall size={18} className="text-gray-400" />}
+                                suffix={<PhoneCall size={18} className="text-muted-foreground" />}
                                 maxLength={11}
+                                className="h-12 text-lg font-medium"
                             />
                         </FormItem>
                     </MotionDiv>
@@ -144,17 +146,17 @@ export const Data:FC<DataFormProps> = ({ handleContinue }) => {
                         >
                             <MotionDiv
                                 onClick={() => selectedNetwork && setIsPlanModalOpen(true)}
-                                className={`w-full min-h-12 px-4 flex items-center justify-between border rounded-xl cursor-pointer transition-all ${!selectedNetwork ? 'opacity-50 cursor-not-allowed bg-muted' : 'hover:border-primary'}`}
+                                className={`w-full min-h-14 px-4 flex items-center justify-between border rounded-xl cursor-pointer transition-all ${!selectedNetwork ? 'opacity-50 cursor-not-allowed bg-muted/50 border-dashed' : 'hover:border-primary border-input bg-card'}`}
                                 whileHover={selectedNetwork ? { scale: 1.01 } : {}}
                                 whileTap={selectedNetwork ? { scale: 0.99 } : {}}
                             >
                                 {selectedPlan ? (
-                                    <div className="flex flex-col">
-                                        <span className="font-medium">{selectedPlan.name}</span>
+                                    <div className="flex flex-col py-1">
+                                        <span className="font-semibold text-base">{selectedPlan.name}</span>
                                         <span className="text-xs text-muted-foreground">₦{selectedPlan.variation_amount}</span>
                                     </div>
                                 ) : (
-                                    <span className="text-muted-foreground">
+                                    <span className="text-muted-foreground font-medium">
                                         {selectedNetwork ? "Choose a plan" : "Select network first"}
                                     </span>
                                 )}
