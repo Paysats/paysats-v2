@@ -27,7 +27,7 @@ export const AppLayout = ({ children, serviceTabs = true }: AppLayoutProps) => {
 
             <AnimatePresence mode="wait">
                 <MotionMain
-                    className="flex-1 w-full max-w-3xl mx-auto flex flex-col gap-6 px-4 py-6 md:py-8"
+                    className="flex-1 w-full justify-center max-w-3xl mx-auto flex flex-col gap-6 px-4 py-6 md:py-8"
                     variants={pageTransitionVariants}
                     initial="initial"
                     animate="animate"
