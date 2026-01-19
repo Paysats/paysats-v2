@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express"
 import cors from "cors"
-import { RateLimitMiddleware } from "./middlewares/rateLimit.middleware"
+
 // routes
 import healthRoutes from "./routes/health.routes"
 import paymentRoutes from "./routes/payment.routes"
@@ -13,12 +13,19 @@ import { handleControllerError, responseHandler } from "./utils/responseHandler"
 import logger from "@/utils/logger"
 import { config } from "./config/config"
 
+import http from 'http';
+import { initSocketService } from './services/socket.service';
+
 const app = express()
+const server = http.createServer(app);
 const PORT = config.app.PORT
+
+// Initialize Socket.IO
+initSocketService(server);
 
 // cors
 app.use(cors({
-    origin: [config.app.FRONTEND_URL, "http://localhost:3000"], 
+    origin: [config.app.FRONTEND_URL, "http://localhost:3000"],
     optionsSuccessStatus: 200,
     credentials: true,
 }))
@@ -76,11 +83,11 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
-    logger.info(`Environment: ${process.env.NODE_ENV}`);
-    logger.info(`Server started at: http://localhost:${PORT}`);
-  });
+    server.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`);
+        logger.info(`Environment: ${process.env.NODE_ENV}`);
+        logger.info(`Server started at: http://localhost:${PORT}`);
+    });
 }
 
 // // start server

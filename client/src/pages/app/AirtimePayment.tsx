@@ -11,13 +11,50 @@ import { toast } from "react-next-toast";
 import { isTransactionExpired, isTransactionFinal } from "@/utils/transaction";
 import { toPng } from 'html-to-image';
 import { createRoot } from 'react-dom/client';
+import { usePaymentSocket } from "@/hooks/usePaymentSocket";
+
 
 const AirtimeFlowContent = () => {
     const { currentStep, paymentData, setStep, setPaymentData, goToNextStep, resetFlow, isRestoringSession } = usePaymentFlow();
     const [loading, setLoading] = useState(false);
     const [transaction, setTransaction] = useState<Transaction | null>(null);
-    const [pollingInterval, setPollingInterval] = useState<number | null>(null);
+    // const [pollingInterval, setPollingInterval] = useState<number | null>(null); // Removed polling
     const [sessionRestored, setSessionRestored] = useState<boolean>(false);
+
+    // Socket integration
+    usePaymentSocket(paymentData?.reference, (data: any) => {
+        // Handle socket update
+        if (data && data.status) {
+            handleTransactionUpdate({ status: data.status, ...data });
+        }
+    });
+
+    const handleTransactionUpdate = async (update: any) => {
+        // Fetch full transaction to be safe/canonical, or use update data if sufficient
+        // For now, let's fetch to ensure we have latest structure
+        if (!paymentData?.reference) return;
+
+        try {
+            const txn = await transactionService.getTransaction(paymentData.reference);
+            setTransaction(txn);
+
+            if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
+                if (currentStep === PaymentStepsEnum.PAYMENT) {
+                    toast.success('Payment detected! Processing your order...');
+                    goToNextStep();
+                }
+            } else if (txn.status === 'SUCCESS') {
+                if (currentStep !== PaymentStepsEnum.SUCCESS) {
+                    toast.success('Airtime delivered successfully! 🚀');
+                    setStep(PaymentStepsEnum.SUCCESS);
+                }
+            } else if (txn.status === 'FAILED' || txn.status === 'EXPIRED') {
+                toast.error(txn.failureReason || 'Transaction failed.');
+            }
+        } catch (e) {
+            console.error("Error updating transaction from socket event", e);
+        }
+    };
 
     // Restore transaction status when session is restored
     useEffect(() => {
@@ -43,19 +80,14 @@ const AirtimeFlowContent = () => {
                 if (txn.status === 'PENDING') {
                     // Still waiting for payment
                     toast.success('Session restored! Continue with your payment.');
-                    if (currentStep === 'review') {
-                        // User was on review page
-                    } else if (currentStep === 'payment') {
-                        // Resume polling
-                        startPolling(paymentData.reference);
-                    }
+                    // socket connection start point...
                 } else if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
                     // Payment detected, ensure we're on payment or later step
                     toast.success('Payment detected! Processing your order...');
                     if (currentStep === 'review') {
                         setStep('payment');
                     }
-                    startPolling(paymentData.reference);
+                    // Socket handles subsequent updates
                 } else if (txn.status === 'SUCCESS') {
                     // Transaction completed successfully
                     toast.success('Your transaction was completed successfully!');
@@ -78,31 +110,30 @@ const AirtimeFlowContent = () => {
         checkRestoredTransaction();
     }, [isRestoringSession, sessionRestored, paymentData?.reference, currentStep]);
 
-    // Cleanup polling on unmount
-    useEffect(() => {
-        return () => {
-            if (pollingInterval) {
-                clearInterval(pollingInterval);
-            }
-        };
-    }, [pollingInterval]);
+    // Cleanup polling on unmount - no longer needed as socket hook handles cleanup
+    // useEffect(() => {
+    //     return () => {
+    //         if (pollingInterval) {
+    //             clearInterval(pollingInterval);
+    //         }
+    //     };
+    // }, [pollingInterval]);
 
     const handleFormSubmit = async (formData: any) => {
         setLoading(true);
-        
+
         try {
             const result = await transactionService.createAirtimeTransaction({
                 network: formData.network,
                 phoneNumber: formData.phoneNumber,
                 amount: Number(formData.amount),
             });
-console.log('airtime transaction result ===> :', result);
+            console.log('airtime transaction result ===> :', result);
             const bchAmount = result.transaction.amount.bch;
             const bchRate = result.transaction.amount.rate;
-            
-            // Store transaction result
+
             setTransaction(result as unknown as Transaction);
-            
+
             const payment: PaymentData = {
                 serviceName: 'Airtime',
                 serviceProvider: `${formData.network} Airtime`,
@@ -129,69 +160,10 @@ console.log('airtime transaction result ===> :', result);
     };
 
     const handleProceedToPayment = () => {
-        if (paymentData && paymentData.reference) {
-            // Start polling for payment status
-            startPolling(paymentData.reference);
-        }
+        // no polling to start
         goToNextStep();
     };
 
-    const startPolling = (reference: string) => {
-        // clear any existing polling interval
-        if (pollingInterval) {
-            clearInterval(pollingInterval);
-        }
-
-        // poll every 3 secs
-        const interval = setInterval(async () => {
-            try {
-                const txn = await transactionService.getTransaction(reference);
-                setTransaction(txn);
-
-                // check if trx has reached a final state
-                if (isTransactionFinal(txn.status)) {
-                    clearInterval(interval);
-                    setPollingInterval(null);
-                }
-
-                // Check if payment is confirmed
-                if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
-                    // Payment detected, move to processing
-                    if (currentStep === PaymentStepsEnum.PAYMENT) {
-                        toast.success('Payment detected! Processing your order...');
-                        goToNextStep();
-                    }
-                }
-
-                // Check if service is fulfilled
-                if (txn.status === 'SUCCESS') {
-                    if (currentStep !== PaymentStepsEnum.SUCCESS) {
-                        toast.success('Airtime delivered successfully! 🚀');
-                        setStep(PaymentStepsEnum.SUCCESS);
-                    }
-                }
-
-                // Check if transaction failed
-                if (txn.status === 'FAILED' || txn.status === 'EXPIRED') {
-                    toast.error(txn.failureReason || 'Transaction failed. Please try again.');
-                    // Don't reset automatically - let user see the error
-                }
-            } catch (error) {
-                console.error('Error polling transaction:', error);
-            }
-        }, 3000); // Poll every 3 seconds
-
-        setPollingInterval(interval);
-
-        // Stop polling after 15 minutes (transaction expiry time)
-        setTimeout(() => {
-            if (interval) {
-                clearInterval(interval);
-                setPollingInterval(null);
-                toast.warning('Transaction has expired. Please start a new transaction.');
-            }
-        }, 15 * 60 * 1000);
-    };
 
     const handlePaymentConfirmed = () => {
     };
@@ -235,7 +207,7 @@ console.log('airtime transaction result ===> :', result);
             await new Promise(resolve => setTimeout(resolve, 100));
 
             const receiptElement = container.querySelector('#receipt-container') as HTMLElement;
-            
+
             if (!receiptElement) {
                 throw new Error('Receipt element not found');
             }
@@ -264,11 +236,6 @@ console.log('airtime transaction result ===> :', result);
     };
 
     const handleDone = () => {
-        // Clear polling if active
-        if (pollingInterval) {
-            clearInterval(pollingInterval);
-            setPollingInterval(null);
-        }
         resetFlow();
         setTransaction(null);
     };
@@ -305,7 +272,7 @@ console.log('airtime transaction result ===> :', result);
 
         return (
             <AppLayout serviceTabs={false}>
-                <PaymentReview 
+                <PaymentReview
                     data={reviewData}
                     onProceed={handleProceedToPayment}
                     onCancel={() => setStep('form')}
@@ -323,21 +290,21 @@ console.log('airtime transaction result ===> :', result);
             paymentFor: paymentData.paymentFor,
         };
 
-        
+
 
         return (
             <AppLayout serviceTabs={false}>
-                <PaymentQR 
+                <PaymentQR
                     data={qrData}
                     qrUrl={paymentData.qrUrl}
                     paymentLink={paymentData.paymentLink}
                     onManualCheck={async () => {
                         // Force refresh transaction status
                         if (!paymentData.reference) return;
-                        
+
                         const txn = await transactionService.getTransaction(paymentData.reference);
                         setTransaction(txn);
-                        
+
                         if (txn.status === 'PENDING') {
                             toast.info('Payment not detected yet. Please wait a moment.');
                         } else if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
@@ -350,10 +317,6 @@ console.log('airtime transaction result ===> :', result);
                         }
                     }}
                     onCancel={() => {
-                        if (pollingInterval) {
-                            clearInterval(pollingInterval);
-                            setPollingInterval(null);
-                        }
                         setStep('review');
                     }}
                 />
@@ -374,7 +337,7 @@ console.log('airtime transaction result ===> :', result);
 
         return (
             <AppLayout serviceTabs={false}>
-                <PaymentSuccess 
+                <PaymentSuccess
                     data={successData}
                     onShare={handleShareReceipt}
                     onDownload={handleDownloadReceipt}
@@ -394,7 +357,7 @@ console.log('airtime transaction result ===> :', result);
 
         return (
             <AppLayout serviceTabs={false}>
-                <ShareReceipt 
+                <ShareReceipt
                     data={shareData}
                     onDownload={handleDownloadReceipt}
                 />

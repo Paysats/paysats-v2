@@ -3,12 +3,14 @@ import { TransactionService } from '@/services/transaction.service';
 import { PromptCashService } from '@/services/promptcash.service';
 import logger from '@/utils/logger';
 
+import { emitPaymentUpdate } from '@/services/socket.service';
+
 /**
  * Handle Prompt.cash webhook callbacks
  */
 export const handlePromptCashWebhook = async (req: Request, res: Response) => {
     const webhookReceivedAt = Date.now();
-    
+
     try {
         const webhookPayload = req.body;
         const paymentData = webhookPayload.payment;
@@ -37,6 +39,12 @@ export const handlePromptCashWebhook = async (req: Request, res: Response) => {
 
         // 3. Handle payment confirmation (pass the payment object)
         await TransactionService.handlePaymentConfirmation(reference, paymentData);
+
+        // 3.5 Emit socket update
+        emitPaymentUpdate(reference, {
+            status: 'PAYMENT_CONFIRMED',
+            ...paymentData
+        });
 
         // 4. Log webhook processing time
         const processingTime = Date.now() - webhookReceivedAt;
