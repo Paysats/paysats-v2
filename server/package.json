@@ -1,14 +1,14 @@
 {
-  "name": "@aboutly/server",
+  "name": "@paysats/server",
   "version": "1.0.0",
-  "description": "API for aboutly — Your professional identity, beautifully simple.",
-  "homepage": "https://github.com/eimaam/aboutly#readme",
+  "description": "API for paysats — Your everyday with Bitcoin Cash",
+  "homepage": "https://github.com/Paysats/paysats-v2#readme",
   "bugs": {
-    "url": "https://github.com/eimaam/aboutly/issues"
+    "url": "https://github.com/Paysats/paysats-v2/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eimaam/aboutly.git"
+    "url": "git+https://github.com/Paysats/paysats-v2.git"
   },
   "license": "ISC",
   "author": "Imam Dahir Dan-Azumi",

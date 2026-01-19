@@ -59,7 +59,7 @@ app.use("/webhooks", webhookRoutes);
 // Root endpoint
 app.get('/', (_req, res) => {
     res.json({
-        message: 'Aboutly API Server',
+        message: 'paysats API Server',
         version: '1.0.0',
         documentation: '/api/docs',
     });
