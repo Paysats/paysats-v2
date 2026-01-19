@@ -8,7 +8,6 @@ COPY package.json package-lock.json* ./
 # Copy workspace package.json files
 COPY server/package.json ./server/
 COPY shared/package.json ./shared/
-COPY client/package.json ./client/
 
 # Install dependencies (including devDependencies for building)
 RUN npm install
