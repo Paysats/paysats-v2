@@ -8,6 +8,8 @@ import { isAppSubdomain } from './utils/isAppSubdomain';
 import NotFound from './pages/NotFound';
 import { AppRoutes } from './routes/AppRoutes';
 import { MarketingRoutes } from './routes/MarketingRoutes';
+import { PWAInstallPrompt } from './components/app/PWAInstallPrompt';
+
 function App() {
   const [mounted, setMounted] = useState(false);
 
@@ -36,15 +38,17 @@ function App() {
         algorithm: theme.defaultAlgorithm,
       }}
     >
-        {
-          isApp ? (
-            <AppRoutes />
-          ) : (
-            <MarketingRoutes />
-          )
-        }
+      {
+        isApp ? (
+          <AppRoutes />
+        ) : (
+          <MarketingRoutes />
+        )
+      }
+      <PWAInstallPrompt />
     </ConfigProvider>
   )
 }
 
 export default App
+
