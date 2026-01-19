@@ -6,7 +6,7 @@ import { X, Download, Smartphone } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 
 export const PWAInstallPrompt: React.FC = () => {
-    const { isInstallable, installApp } = usePWA();
+    const { isInstallable, installApp, isIOS } = usePWA();
     const [show, setShow] = useState<boolean>(false);
 
     useEffect(() => {
@@ -22,6 +22,10 @@ export const PWAInstallPrompt: React.FC = () => {
     };
 
     const handleInstall = async () => {
+        if (isIOS) {
+            // For iOS, just show instructions
+            return;
+        }
         await installApp();
         setShow(false);
     };
@@ -64,30 +68,54 @@ export const PWAInstallPrompt: React.FC = () => {
                                     Install PaySats
                                 </h3>
                                 <p className="text-sm text-secondary-text leading-relaxed">
-                                    Get the best experience by installing PaySats to your home screen. It's fast, secure, and works offline.
+                                    {isIOS
+                                        ? "To install, tap the Share icon below and select 'Add to Home Screen'."
+                                        : "Get the best experience by installing PaySats to your home screen. It's fast, secure, and works offline."}
                                 </p>
                             </div>
                         </div>
 
-                        <div className="mt-5 flex gap-3">
-                            <MotionButton
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={handleInstall}
-                                className="flex-1 bg-primary text-primary-foreground font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary-600 transition-colors"
-                            >
-                                <Download size={18} />
-                                Install Now
-                            </MotionButton>
-                            <MotionButton
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={handleDismiss}
-                                className="bg-secondary text-secondary-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors"
-                            >
-                                Later
-                            </MotionButton>
-                        </div>
+                        {!isIOS ? (
+                            <div className="mt-5 flex gap-3">
+                                <MotionButton
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleInstall}
+                                    className="flex-1 bg-primary text-primary-foreground font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary-600 transition-colors"
+                                >
+                                    <Download size={18} />
+                                    Install Now
+                                </MotionButton>
+                                <MotionButton
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleDismiss}
+                                    className="bg-secondary text-secondary-foreground font-semibold py-3 px-4 rounded-xl hover:bg-muted transition-colors"
+                                >
+                                    Later
+                                </MotionButton>
+                            </div>
+                        ) : (
+                            <div className="mt-5 p-3 bg-secondary/50 rounded-xl flex items-center justify-center gap-4 border border-border/30">
+                                <div className="flex flex-col items-center gap-1">
+                                    <div className="p-2 bg-card rounded-lg shadow-sm">
+                                        <svg width="20" height="20" viewBox="0 0 512 512" fill="currentColor" className="text-blue-500">
+                                            <path d="M288 192V66.75l63.58 63.58a16 16 0 0022.62-22.62l-90.49-90.49a16 16 0 00-22.62 0l-90.49 90.49a16 16 0 0022.62 22.62L224 66.75V192h64zM400 160h-64v64h64v224H112V224h64v-64H112c-26.51 0-48 21.49-48 48v224c0 26.51 21.49 48 48 48h288c26.51 0 48-21.49 48-48V208c0-26.51-21.49-48-48-48z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Share</span>
+                                </div>
+                                <div className="h-8 w-px bg-border/50" />
+                                <div className="flex flex-col items-center gap-1">
+                                    <div className="p-2 bg-card rounded-lg shadow-sm">
+                                        <svg width="20" height="20" viewBox="0 0 512 512" fill="currentColor">
+                                            <path d="M448 224h-128v-128c0-17.67-14.33-32-32-32s-32 14.33-32 32v128h-128c-17.67 0-32 14.33-32 32s14.33 32 32 32h128v128c0 17.67 14.33 32 32 32s32-14.33 32-32v-128h128c17.67 0 32-14.33 32-32s-14.33-32-32-32z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Add to home</span>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="mt-4 pt-4 border-t border-border/50 flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
                             <span className="flex items-center gap-1">
@@ -101,3 +129,4 @@ export const PWAInstallPrompt: React.FC = () => {
         </AnimatePresence>
     );
 };
+

@@ -13,14 +13,24 @@ export const usePWA = () => {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isInstallable, setIsInstallable] = useState(false);
     const [isInstalled, setIsInstalled] = useState(false);
+    const [isIOS, setIsIOS] = useState(false);
 
     useEffect(() => {
+        // Detect iOS
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        const ios = /iphone|ipad|ipod/.test(userAgent);
+        setIsIOS(ios);
+
         // check if app is already installed
-        if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
-            setIsInstalled(true);
+        const standalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
+        setIsInstalled(standalone);
+
+        // if iOS and not standalone, it's "installable" (manually)
+        if (ios && !standalone) {
+            setIsInstallable(true);
         }
 
-        // check if we already have a captured prompt
+        // check if there's already a captured prompt (for non-iOS)
         if ((window as any).deferredPrompt) {
             setDeferredPrompt((window as any).deferredPrompt);
             setIsInstallable(true);
@@ -53,7 +63,11 @@ export const usePWA = () => {
     }, []);
 
 
+
     const installApp = async () => {
+        // iOS doesn't support the automated prompt
+        if (isIOS) return;
+
         if (!deferredPrompt) return;
 
         // show the install prompt
@@ -72,5 +86,6 @@ export const usePWA = () => {
         setIsInstallable(false);
     };
 
-    return { isInstallable, isInstalled, installApp };
+    return { isInstallable, isInstalled, installApp, isIOS };
 };
+

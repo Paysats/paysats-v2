@@ -24,6 +24,7 @@ export default defineConfig({
         scope: '/',
         id: '/',
         orientation: 'portrait',
+        prefer_related_applications: false,
         icons: [
           {
             src: 'icon-192.png',
@@ -43,10 +44,36 @@ export default defineConfig({
           }
         ]
       },
+      workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
+      },
       devOptions: {
-        enabled: true
+        enabled: true,
+        /* when using generateSW the PWA injectRegister will use the virtual module registerSW */
+        navigateFallback: 'index.html',
+        suppressWarnings: true
       }
     })
+
+
 
   ],
   resolve: {
