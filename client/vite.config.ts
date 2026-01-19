@@ -11,14 +11,19 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      injectRegister: 'auto',
+      includeAssets: ['apple-touch-icon.png', 'paysats-logo.png'],
       manifest: {
         name: 'Paysats',
         short_name: 'Paysats',
         description: 'Paysats — your everyday with bitcoincash',
-        theme_color: '#000000',
+        theme_color: '#33C279',
         background_color: '#000000',
         display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        id: '/',
+        orientation: 'portrait',
         icons: [
           {
             src: 'icon-192.png',
@@ -37,8 +42,12 @@ export default defineConfig({
             purpose: 'any maskable'
           }
         ]
+      },
+      devOptions: {
+        enabled: true
       }
     })
+
   ],
   resolve: {
     alias: {

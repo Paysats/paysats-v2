@@ -20,12 +20,19 @@ export const usePWA = () => {
             setIsInstalled(true);
         }
 
+        // check if we already have a captured prompt
+        if ((window as any).deferredPrompt) {
+            setDeferredPrompt((window as any).deferredPrompt);
+            setIsInstallable(true);
+        }
+
         const handler = (e: Event) => {
             // prevent the mini-infobar from appearing on mobile
             e.preventDefault();
             // stash the event so it can be triggered later.
             setDeferredPrompt(e as BeforeInstallPromptEvent);
             setIsInstallable(true);
+            (window as any).deferredPrompt = e;
         };
 
         window.addEventListener('beforeinstallprompt', handler);
@@ -34,6 +41,7 @@ export const usePWA = () => {
             setIsInstalled(true);
             setIsInstallable(false);
             setDeferredPrompt(null);
+            (window as any).deferredPrompt = null;
         };
 
         window.addEventListener('appinstalled', installedHandler);
@@ -43,6 +51,7 @@ export const usePWA = () => {
             window.removeEventListener('appinstalled', installedHandler);
         };
     }, []);
+
 
     const installApp = async () => {
         if (!deferredPrompt) return;
