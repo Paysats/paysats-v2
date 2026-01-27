@@ -66,7 +66,30 @@ const AirtimeFlowContent = () => {
 
             try {
                 console.log('Checking restored transaction status:', paymentData.reference);
-                const txn = await transactionService.getTransaction(paymentData.reference);
+
+                let txn;
+                if (paymentData.reference && paymentData.reference.startsWith('DEMO-')) {
+                    // Mock restoration for demo
+                    txn = {
+                        reference: paymentData.reference,
+                        status: 'PENDING', // Default to PENDING for demo restore
+                        amount: {
+                            bch: paymentData.bchAmount,
+                            rate: paymentData.bchRate,
+                            source: paymentData.amount
+                        },
+                        network: 'mtn', // fallback
+                        phoneNumber: '08012345678',
+                        createdAt: new Date().toISOString(),
+                    } as any;
+
+                    // If we are in SUCCESS step, maybe we should return SUCCESS status? 
+                    // But usually restore happens on reload. 
+                    // Let's just assume PENDING for now so they can pay again or continue simulation.
+                } else {
+                    txn = await transactionService.getTransaction(paymentData.reference);
+                }
+
                 setTransaction(txn);
 
                 // Check if transaction has expired
@@ -122,30 +145,62 @@ const AirtimeFlowContent = () => {
     const handleFormSubmit = async (formData: any) => {
         setLoading(true);
 
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
         try {
-            const result = await transactionService.createAirtimeTransaction({
+            // Mock transaction creation
+            const reference = `DEMO-${Date.now()}`;
+            const amount = Number(formData.amount);
+
+            // Mock conversion rates (approximate)
+            const rates: Record<string, number> = {
+                'BCH': 0.00035, // 1 BCH ≈ $500, so 1000 NGN (approx $0.60) ≈ 0.0012 BCH. Let's say 1 NGN ≈ 0.0000012 BCH
+                'BTC': 0.000010,
+                'SOL': 0.004,
+                'FUSD': 0.60,
+                'ZANO': 0.5,
+                'BCHX': 100
+            };
+
+            const rate = 1 / (rates[formData.crypto] || 1); // Inverse rate just for show, or just mock it
+            const cryptoNativeAmount = (amount / 1650) / (rates[formData.crypto] === undefined ? 1000 : rates[formData.crypto]); // Very rough approximation, assuming rate is USD price
+
+            // actually let's just use simple random numbers for demo
+            const cryptoAmount = 0.001234;
+
+            // Mock response
+            const mockTransaction = {
+                reference,
+                status: 'PENDING',
+                amount: {
+                    bch: cryptoAmount, // keeping field name bch/rate for compatibility but treating as generic
+                    rate: 1650,
+                    source: amount
+                },
                 network: formData.network,
                 phoneNumber: formData.phoneNumber,
-                amount: Number(formData.amount),
-            });
-            console.log('airtime transaction result ===> :', result);
-            const bchAmount = result.transaction.amount.bch;
-            const bchRate = result.transaction.amount.rate;
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            };
 
-            setTransaction(result as unknown as Transaction);
+            setTransaction(mockTransaction as unknown as Transaction);
 
             const payment: PaymentData = {
                 serviceName: 'Airtime',
                 serviceProvider: `${formData.network} Airtime`,
                 amount: formData.amount,
-                bchAmount,
-                bchRate,
+                bchAmount: cryptoAmount,
+                bchRate: 1650,
                 paymentFor: `Airtime - ${formData.phoneNumber}`,
-                reference: result.transaction.reference,
-                bchAddress: result.payment.address,
-                qrUrl: result.payment.qrUrl,
-                paymentLink: result.payment.paymentLink,
-                formData,
+                reference: reference,
+                bchAddress: `bitcoincash:qr_mock_address_for_${formData.crypto}`, // This will need to be adjusted for other coins in PaymentQR
+                qrUrl: undefined, // Let PaymentQR generate it
+                paymentLink: undefined,
+                formData: {
+                    ...formData,
+                    crypto: formData.crypto // Pass crypto selection
+                },
             };
 
             setPaymentData(payment);
@@ -153,11 +208,12 @@ const AirtimeFlowContent = () => {
             toast.success('Transaction created successfully!');
         } catch (error: any) {
             console.error('Error creating transaction:', error);
-            toast.error(error?.response?.data?.message || 'Failed to create transaction. Please try again.');
+            toast.error('Failed to create transaction. Please try again.');
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleProceedToPayment = () => {
         // no polling to start
@@ -190,7 +246,9 @@ const AirtimeFlowContent = () => {
                 transactionReference: paymentData.reference,
                 date: transaction?.paidAt ? new Date(transaction.paidAt).toLocaleString() : new Date().toLocaleString(),
                 phoneNumber: paymentData.formData?.phoneNumber,
+                currency: paymentData.formData?.crypto || 'BCH',
             };
+
 
             // create temp container
             const container = document.createElement('div');
@@ -240,6 +298,31 @@ const AirtimeFlowContent = () => {
         setTransaction(null);
     };
 
+    // Simulation Effect (Moved to top level)
+    useEffect(() => {
+        if (currentStep === PaymentStepsEnum.PAYMENT && paymentData?.reference) {
+            console.log("Starting simulation for", paymentData.reference);
+
+            // 1. Simulate "Processing" after 5 seconds
+            const processingTimer = setTimeout(() => {
+                toast.success('Payment detected! Processing your order...');
+                
+
+                // 2. simulate "Success" after another 5 seconds
+                const successTimer = setTimeout(() => {
+                    toast.success('Airtime delivered successfully!');
+                    setStep(PaymentStepsEnum.SUCCESS);
+
+                    setTransaction(prev => prev ? ({ ...prev, status: 'SUCCESS', paidAt: new Date().toISOString() }) : null);
+                }, 5000);
+
+                return () => clearTimeout(successTimer);
+            }, 5000);
+
+            return () => clearTimeout(processingTimer);
+        }
+    }, [currentStep, paymentData?.reference]);
+
     // show loading state while restoring session
     if (isRestoringSession) {
         return (
@@ -267,7 +350,8 @@ const AirtimeFlowContent = () => {
             bchAmount: paymentData.bchAmount,
             bchRate: paymentData.bchRate,
             paymentFor: paymentData.paymentFor,
-            expiryMinutes: 5, // Custom expiration time (prompt.cash default is 30)
+            expiryMinutes: 5,
+            currency: paymentData.formData?.crypto || 'BCH',
         };
 
         return (
@@ -282,15 +366,14 @@ const AirtimeFlowContent = () => {
         );
     }
 
+
     if (currentStep === PaymentStepsEnum.PAYMENT) {
         const qrData: PaymentQRData = {
             bchAddress: paymentData.bchAddress || '',
             bchAmount: paymentData.bchAmount,
-            amountUSD: paymentData.amount / 1650, // Approximate USD value
+            amountUSD: paymentData.amount / 1650,
             paymentFor: paymentData.paymentFor,
         };
-
-
 
         return (
             <AppLayout serviceTabs={false}>
@@ -298,23 +381,12 @@ const AirtimeFlowContent = () => {
                     data={qrData}
                     qrUrl={paymentData.qrUrl}
                     paymentLink={paymentData.paymentLink}
+                    currency={paymentData.formData?.crypto || 'BCH'} // Pass currency
                     onManualCheck={async () => {
-                        // Force refresh transaction status
-                        if (!paymentData.reference) return;
-
-                        const txn = await transactionService.getTransaction(paymentData.reference);
-                        setTransaction(txn);
-
-                        if (txn.status === 'PENDING') {
-                            toast.info('Payment not detected yet. Please wait a moment.');
-                        } else if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
-                            toast.success('Payment detected! Processing your order...');
-                        } else if (txn.status === 'SUCCESS') {
-                            toast.success('Airtime delivered successfully!');
-                            setStep(PaymentStepsEnum.SUCCESS);
-                        } else {
-                            toast.error('Transaction status: ' + txn.status);
-                        }
+                        // manual check.. simulation
+                        toast.info('Checking blockchain status...');
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        toast.info('Payment not detected yet. Please wait or ensure you sent the correct amount.');
                     }}
                     onCancel={() => {
                         setStep('review');
@@ -323,6 +395,7 @@ const AirtimeFlowContent = () => {
             </AppLayout>
         );
     }
+
 
     if (currentStep === PaymentStepsEnum.SUCCESS) {
         const successData: PaymentSuccessData = {
@@ -333,6 +406,7 @@ const AirtimeFlowContent = () => {
             bchAmount: paymentData.bchAmount,
             transactionReference: paymentData.reference,
             date: transaction?.paidAt ? new Date(transaction.paidAt).toLocaleString() : new Date().toLocaleString(),
+            currency: paymentData.formData?.crypto || 'BCH',
         };
 
         return (
@@ -349,10 +423,11 @@ const AirtimeFlowContent = () => {
 
     if (currentStep === PaymentStepsEnum.SHARE) {
         const shareData: ShareReceiptData = {
-            title: 'Just topped up my airtime with Bitcoin Cash ⚡',
+            title: `Just topped up my airtime with ${paymentData.formData?.crypto || 'Bitcoin Cash'} ⚡`,
             serviceProvider: paymentData.serviceProvider?.toUpperCase(),
             amount: paymentData.amount,
             bchAmount: paymentData.bchAmount,
+            currency: paymentData.formData?.crypto || 'BCH',
         };
 
         return (

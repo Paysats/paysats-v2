@@ -13,6 +13,15 @@ import { NetworkProviderEnum } from "@shared/types/network-provider.types"
 import { rateService } from "@/api/services/rate.service"
 import { Spin } from "antd"
 
+const CRYPTO_CURRENCIES = [
+    { symbol: 'BCH', name: 'Bitcoin Cash', icon: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png?v=032' },
+    { symbol: 'FUSD', name: 'FUSD', icon: 'https://cryptologos.cc/logos/first-digital-usd-fdusd-logo.png?v=040' },
+    { symbol: 'BTC', name: 'Bitcoin', icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032' },
+    { symbol: 'ZANO', name: 'Zano', icon: 'https://s2.coinmarketcap.com/static/img/coins/200x200/4691.png' },
+    { symbol: 'SOL', name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.png?v=032' },
+];
+
+
 interface AirtimeFormProps {
     handleContinue: (data: any) => void;
     loading?: boolean;
@@ -21,6 +30,7 @@ interface AirtimeFormProps {
 export const AirtimeForm: FC<AirtimeFormProps> = ({ handleContinue, loading = false }) => {
     const [form] = Form.useForm();
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
+    const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
     const amount = Form.useWatch('amount', form);
     const [bchAmount, setBchAmount] = useState<number>(0);
     const [convertingRate, setConvertingRate] = useState<boolean>(false);
@@ -66,7 +76,8 @@ export const AirtimeForm: FC<AirtimeFormProps> = ({ handleContinue, loading = fa
     const onFinish = (values: any) => {
         const data = {
             ...values,
-            network: selectedNetwork?.toLowerCase()
+            network: selectedNetwork?.toLowerCase(),
+            crypto: selectedCrypto
         }
         handleContinue(data);
     };
@@ -126,6 +137,49 @@ export const AirtimeForm: FC<AirtimeFormProps> = ({ handleContinue, loading = fa
                                                 >
                                                     <img src={provider.logo} alt={provider.name} className="w-8 h-8 object-contain" />
                                                     <p className="font-medium text-[10px] md:text-xs">{provider.name}</p>
+                                                </button>
+                                            </MotionDiv>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </FormItem>
+                    </MotionDiv>
+
+                    {/* select crypto */}
+                    <MotionDiv className="flex flex-col gap-4 mt-4" variants={staggerItemVariants}>
+                        <h3 className="text-lg font-semibold">
+                            Select Cryptocurrency
+                        </h3>
+                        <FormItem
+                            name="crypto"
+                            rules={[{ required: true, message: 'Please select a cryptocurrency' }]}
+                        >
+                            <div className="grid grid-cols-3 gap-3 w-full">
+                                {
+                                    CRYPTO_CURRENCIES?.map((crypto) => {
+                                        return (
+                                            <MotionDiv
+                                                key={crypto.symbol}
+                                                whileHover={{ scale: 1.05, y: -2 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                className="w-full"
+                                            >
+                                                <button
+                                                    type="button"
+                                                    onClick={
+                                                        () => {
+                                                            setSelectedCrypto(crypto?.symbol);
+                                                            form.setFieldValue('crypto', crypto?.symbol);
+                                                        }
+                                                    }
+                                                    className={`w-full cursor-pointer hover:border-primary transition-all duration-300 flex flex-col border items-center justify-center gap-2 py-3 rounded-2xl ${selectedCrypto === crypto?.symbol ? "border-primary border-2 bg-primary/5 shadow-sm" : "border-border bg-card hover:bg-muted/50"}`}
+                                                >
+                                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full overflow-hidden flex items-center justify-center p-1">
+                                                        <img src={crypto?.icon} alt={crypto?.name} className="w-full h-full object-contain" />
+                                                    </div>
+                                                    <p className="font-bold text-sm">{crypto?.symbol}</p>
+                                                    <p className="text-[10px] md:text-xs text-muted-foreground">{crypto?.name}</p>
                                                 </button>
                                             </MotionDiv>
                                         )
@@ -209,13 +263,13 @@ export const AirtimeForm: FC<AirtimeFormProps> = ({ handleContinue, loading = fa
                             size="lg"
                             htmlType="submit"
                             loading={loading}
-                            disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork || loading}
+                            disabled={!form.getFieldsValue().phoneNumber || !form.getFieldsValue().amount || !selectedNetwork || !selectedCrypto || loading}
                         >
                             {loading ? 'Creating Transaction...' : 'Continue'}
                         </Button>
                     </MotionDiv>
                 </Form>
-            </MotionDiv>
-        </AppLayout>
+            </MotionDiv >
+        </AppLayout >
     )
 }

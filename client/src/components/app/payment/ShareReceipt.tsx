@@ -16,6 +16,7 @@ export interface ShareReceiptData {
     transactionReference?: string;
     date?: string;
     phoneNumber?: string;
+    currency?: string;
 }
 
 interface ShareReceiptProps {
@@ -43,7 +44,7 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
 
     const handleDownload = async () => {
         if (!onDownload) return;
-        
+
         setDownloading(true);
         try {
             await onDownload();
@@ -90,7 +91,7 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
                     <span className="text-foreground font-semibold">{serviceProvider}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span className="text-muted-foreground">{bchAmount.toFixed(4)} BCH</span>
+                    <span className="text-muted-foreground">{bchAmount.toFixed(4)} {data.currency || 'BCH'}</span>
                 </div>
             </MotionDiv>
 
@@ -105,9 +106,9 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
 
                 >
 
-                    <span className="text-primary font-bold text-lg">paysats.io</span>
+                    <span className="text-primary font-bold text-lg">trypaysats.xyz</span>
                     <span className="text-muted-foreground text-sm">
-                        Your everyday with Bitcoin Cash
+                        Your everyday with {data.currency || 'Bitcoin Cash'}
                     </span>
                 </div>
             </MotionDiv>

@@ -13,6 +13,7 @@ export interface PaymentSuccessData {
     transactionId?: string;
     transactionReference?: string;
     date?: string;
+    currency?: string;
 }
 
 interface PaymentSuccessProps {
@@ -50,7 +51,7 @@ export const PaymentSuccess = ({ data, onShare, onDownload, onClose }: PaymentSu
                     {title}
                 </h2>
                 <p className="text-muted-foreground text-center">
-                    Paid with Bitcoin Cash in seconds
+                    Paid with {data.currency || 'Bitcoin Cash'} in seconds
                 </p>
             </MotionDiv>
 
@@ -72,7 +73,7 @@ export const PaymentSuccess = ({ data, onShare, onDownload, onClose }: PaymentSu
                 <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Crypto</span>
                     <span className="font-semibold text-foreground">
-                        {bchAmount.toFixed(4)} BCH
+                        {bchAmount.toFixed(4)} {data.currency || 'BCH'}
                     </span>
                 </div>
             </MotionDiv>

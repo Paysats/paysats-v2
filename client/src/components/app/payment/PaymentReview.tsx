@@ -11,7 +11,9 @@ export interface PaymentReviewData {
     bchRate: number;
     paymentFor: string;
     expiryMinutes?: number;
+    currency?: string;
 }
+
 
 interface PaymentReviewProps {
     data: PaymentReviewData;
@@ -61,9 +63,10 @@ export const PaymentReview = ({ data, onProceed, onCancel, loading = false }: Pa
                     ₦{amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </h1>
                 <p className="text-lg text-muted-foreground flex items-center gap-1">
-                    ≈ {bchAmount.toFixed(4)} BCH
+                    ≈ {bchAmount.toFixed(4)} {data.currency || 'BCH'}
                 </p>
             </MotionDiv>
+
 
             {/* details */}
             <MotionDiv

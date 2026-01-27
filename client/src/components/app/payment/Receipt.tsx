@@ -10,17 +10,29 @@ export interface ReceiptData {
     transactionReference?: string;
     date?: string;
     phoneNumber?: string;
+    currency?: string;
 }
 
 interface ReceiptProps {
     data: ReceiptData;
 }
 
+const CRYPTO_CURRENCIES = {
+    'BCH': { name: 'Bitcoin Cash', icon: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png?v=032' },
+    'BTC': { name: 'Bitcoin', icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032' },
+    'SOL': { name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.png?v=032' },
+    'FUSD': { name: 'FUSD', icon: 'https://cryptologos.cc/logos/first-digital-usd-fdusd-logo.png?v=040' },
+    'ZANO': { name: 'Zano', icon: 'https://s2.coinmarketcap.com/static/img/coins/200x200/4691.png' },
+    'BCHX': { name: 'Bitcoin Cash X', icon: 'https://via.placeholder.com/64/0BDA51/FFFFFF?text=BCHX' },
+};
+
 export const Receipt = ({ data }: ReceiptProps) => {
     const { title, serviceName, serviceProvider, amount, bchAmount, transactionReference, date, phoneNumber } = data;
+    const currency = data.currency || 'BCH';
+    const cryptoInfo = CRYPTO_CURRENCIES[currency as keyof typeof CRYPTO_CURRENCIES] || CRYPTO_CURRENCIES['BCH'];
 
     return (
-        <div 
+        <div
             id="receipt-container"
             className="w-[400px] bg-white rounded-2xl shadow-2xl overflow-hidden"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
@@ -32,7 +44,7 @@ export const Receipt = ({ data }: ReceiptProps) => {
                     <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1"/>
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1" />
                             </pattern>
                         </defs>
                         <rect width="100%" height="100%" fill="url(#grid)" />
@@ -42,14 +54,24 @@ export const Receipt = ({ data }: ReceiptProps) => {
                 {/* Logo */}
                 <div className="relative z-10 flex items-center justify-center mb-4">
                     <div className="flex items-center gap-2">
-                        <Bitcoin size={32} strokeWidth={2.5} />
+                        {/* Dynamic Icon */}
+                        <img
+                            src={cryptoInfo.icon}
+                            alt={cryptoInfo.name}
+                            className="w-8 h-8 object-contain filter brightness-0 invert"
+                        />
                         <span className="text-3xl font-bold">Paysats</span>
                     </div>
                 </div>
 
                 <div className="relative z-10 flex justify-center mb-4">
-                    <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white/30">
-                        <Check size={40} strokeWidth={3} />
+                    <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white/30 overflow-hidden p-2">
+                        {/* Dynamic Icon */}
+                        <img
+                            src={cryptoInfo.icon}
+                            alt={cryptoInfo.name}
+                            className="w-full h-full object-contain filter brightness-0 invert"
+                        />
                     </div>
                 </div>
 
@@ -65,8 +87,8 @@ export const Receipt = ({ data }: ReceiptProps) => {
                     <p className="text-gray-500 text-sm mb-2">Amount Paid</p>
                     <p className="text-4xl font-bold text-gray-900">{formatNGN(amount)}</p>
                     <p className="text-gray-500 mt-2 flex items-center justify-center gap-1">
-                        <Bitcoin size={16} className="text-[#0AC18E]" />
-                        <span>{bchAmount.toFixed(6)} BCH</span>
+                        <img src={cryptoInfo.icon} alt={currency} className="w-4 h-4 object-contain" />
+                        <span>{bchAmount.toFixed(6)} {currency}</span>
                     </p>
                 </div>
 
@@ -78,7 +100,7 @@ export const Receipt = ({ data }: ReceiptProps) => {
                         <span className="text-gray-500 text-sm">Service</span>
                         <span className="font-semibold text-gray-900">{serviceName}</span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                         <span className="text-gray-500 text-sm">Provider</span>
                         <span className="font-semibold text-gray-900">{serviceProvider}</span>
@@ -113,15 +135,15 @@ export const Receipt = ({ data }: ReceiptProps) => {
                 <footer className="text-center space-y-3">
                     <div className="inline-flex items-center gap-2 bg-[#0AC18E]/10 px-4 py-2 rounded-full">
                         <div className="w-2 h-2 rounded-full bg-[#0AC18E] animate-pulse"></div>
-                        <span className="text-sm font-medium text-[#0AC18E]">Paid with Bitcoin Cash</span>
+                        <span className="text-sm font-medium text-[#0AC18E]">Paid with {currency}</span>
                     </div>
-                    
+
                     <p className="text-xs text-gray-400">
                         Fast, secure, and borderless payments
                     </p>
-                    
+
                     <p className="text-xs text-gray-400 mt-4">
-                        paysats.io • Your everyday with BCH
+                        paysats.io • Your everyday with {currency}
                     </p>
                 </footer>
             </main>

@@ -18,10 +18,7 @@ export const Hero: FC = () => {
             >
                 Your everyday with <br />
                 <span className="text-primary flex items-center justify-center">
-                    <FloatingIcon duration={3} rotate={false}>
-                        <Bitcoin className="text-primary p-0 font-extrabold -mr-5" size={90} />
-                    </FloatingIcon>
-                    itcoinCash
+                    Crypto
                 </span>
             </MotionH1>
             <MotionP
