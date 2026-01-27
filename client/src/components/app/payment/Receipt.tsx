@@ -21,9 +21,9 @@ const CRYPTO_CURRENCIES = {
     'BCH': { name: 'Bitcoin Cash', icon: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png?v=032' },
     'BTC': { name: 'Bitcoin', icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032' },
     'SOL': { name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.png?v=032' },
-    'FUSD': { name: 'FUSD', icon: 'https://cryptologos.cc/logos/first-digital-usd-fdusd-logo.png?v=040' },
+    'FUSD': { name: 'FUSD', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs2frUpqLdaN_TcyAUlsS19iNBe2tYgL3HVw&s' },
     'ZANO': { name: 'Zano', icon: 'https://s2.coinmarketcap.com/static/img/coins/200x200/4691.png' },
-    'BCHX': { name: 'Bitcoin Cash X', icon: 'https://via.placeholder.com/64/0BDA51/FFFFFF?text=BCHX' },
+    'BCHX': { name: 'Bitcoin Cash X', icon: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png?v=032' },
 };
 
 export const Receipt = ({ data }: ReceiptProps) => {

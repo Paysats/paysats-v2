@@ -15,9 +15,10 @@ import { Spin } from "antd"
 
 const CRYPTO_CURRENCIES = [
     { symbol: 'BCH', name: 'Bitcoin Cash', icon: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png?v=032' },
-    { symbol: 'FUSD', name: 'FUSD', icon: 'https://cryptologos.cc/logos/first-digital-usd-fdusd-logo.png?v=040' },
+    { symbol: 'FUSD', name: 'FUSD', icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSs2frUpqLdaN_TcyAUlsS19iNBe2tYgL3HVw&s' },
     { symbol: 'BTC', name: 'Bitcoin', icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=032' },
     { symbol: 'ZANO', name: 'Zano', icon: 'https://s2.coinmarketcap.com/static/img/coins/200x200/4691.png' },
+    { symbol: 'BCHX', name: 'Bitcoin Cash X', icon: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png?v=032' },
     { symbol: 'SOL', name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.png?v=032' },
 ];
 
