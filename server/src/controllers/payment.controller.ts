@@ -33,7 +33,7 @@ export class PaymentController {
     static getTransaction = catchAsAsync(async (req: Request, res: Response) => {
         const { reference } = req.params;
 
-        const transaction = await TransactionService.getTransaction(reference);
+        const transaction = await TransactionService.getTransaction(reference as string);
 
         return sendSuccess({
             res,

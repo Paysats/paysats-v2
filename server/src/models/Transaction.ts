@@ -11,7 +11,7 @@ const transactionSchema = new Schema<ITransactionDocument>({
     reference: { type: String, required: true, unique: true, index: true },
 
     serviceType: { type: String, required: true, enum: Object.values(ServiceTypeEnum) },
-    provider: { type: String, required: true, enum: ['VTPASS'] },
+    provider: { type: String, required: true, enum: ['VTPASS', 'PAYSCRIBE'] },
 
     amount: {
         ngn: { type: Number, required: true },

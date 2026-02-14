@@ -4,7 +4,7 @@ import { FulfillmentModel } from '@/models/Fulfillment';
 import { ServiceTypeEnum, TransactionStatusEnum, PaymentStatusEnum, FulfillmentStatusEnum } from '@shared/types';
 import { BCHRateService } from './bchRate.service';
 import { PromptCashService } from './promptcash.service';
-import { VtPassService } from './vtpass.service';
+import { UtilityService } from './utility.service';
 import { CacheService, CACHE_KEYS, CACHE_TTL } from './cache.service';
 import logger from '@/utils/logger';
 import mongoose from 'mongoose';
@@ -31,10 +31,10 @@ export class TransactionService {
         const date = new Date();
         const dateStr = date.toISOString().split('T')[0].replace(/-/g, '');
         const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-        const servicePrefix = serviceType === ServiceTypeEnum.AIRTIME ? 'AIR' : 
-                            serviceType === ServiceTypeEnum.DATA ? 'DATA' : 
-                            serviceType.substring(0, 3).toUpperCase();
-        
+        const servicePrefix = serviceType === ServiceTypeEnum.AIRTIME ? 'AIR' :
+            serviceType === ServiceTypeEnum.DATA ? 'DATA' :
+                serviceType.substring(0, 3).toUpperCase();
+
         return `PAYSATS-${servicePrefix}-${dateStr}-${random}`;
     }
 
@@ -63,7 +63,7 @@ export class TransactionService {
             const transaction = await TransactionModel.create([{
                 reference,
                 serviceType: ServiceTypeEnum.AIRTIME,
-                provider: 'VTPASS',
+                provider: config.utility.DEFAULT_PROVIDER,
                 amount: {
                     ngn: params.amount,
                     bch: amountBCH,
@@ -161,7 +161,7 @@ export class TransactionService {
             }
 
             const internalStatus = PromptCashService.mapStatus(paymentData.status);
-            
+
             payment.status = internalStatus as PaymentStatusEnum;
             payment.txHash = paymentData.hash || payment.txHash;
             payment.confirmations = paymentData.confirmations || 0;
@@ -209,52 +209,89 @@ export class TransactionService {
         }
     }
 
-    private static async fulfillService(transaction: any, session: any) {
+    /**
+     * Manually retry fulfillment for a paid transaction
+     */
+    static async retryFulfillment(reference: string) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            const transaction = await TransactionModel.findOne({ reference }).session(session);
+            if (!transaction) throw new Error('Transaction not found');
+            if (!transaction.paidAt) throw new Error('Transaction not paid yet');
+
+            await this.fulfillService(transaction, session);
+
+            await session.commitTransaction();
+            return transaction;
+        } catch (error) {
+            await session.abortTransaction();
+            throw error;
+        } finally {
+            session.endSession();
+        }
+    }
+
+    public static async fulfillService(transaction: any, session: any) {
         try {
             transaction.status = TransactionStatusEnum.PROCESSING;
             await transaction.save({ session });
 
-            let vtPassResult: any;
+            logger.info('TransactionService: Starting service fulfillment', {
+                reference: transaction.reference,
+                type: transaction.serviceType
+            });
+
+            let fulfillmentResult: any;
 
             if (transaction.serviceType === ServiceTypeEnum.AIRTIME) {
-                vtPassResult = await VtPassService.purchaseAirtime({
-                    serviceId: transaction.serviceMeta.network.toLowerCase(),
+                fulfillmentResult = await UtilityService.purchaseAirtime({
+                    network: transaction.serviceMeta.network,
                     phoneNumber: transaction.serviceMeta.phone,
                     amount: transaction.amount.ngn,
+                    reference: transaction.reference
                 });
             } else if (transaction.serviceType === ServiceTypeEnum.DATA) {
-                throw new Error('Data purchase not yet implemented');
+                fulfillmentResult = await UtilityService.purchaseData({
+                    network: transaction.serviceMeta.network,
+                    phoneNumber: transaction.serviceMeta.phone,
+                    amount: transaction.amount.ngn,
+                    planId: transaction.serviceMeta.planId,
+                    reference: transaction.reference
+                });
             } else {
                 throw new Error(`Unsupported service type: ${transaction.serviceType}`);
             }
 
             const fulfillment = await FulfillmentModel.create([{
                 transactionId: transaction._id,
-                provider: 'VTPASS',
+                provider: fulfillmentResult.provider,
                 serviceType: transaction.serviceType,
-                providerTransactionId: vtPassResult.content?.transactions?.transactionId || '',
-                providerRequestId: vtPassResult.requestId || '',
-                status: vtPassResult.content?.transactions?.status === 'delivered' 
-                    ? FulfillmentStatusEnum.SUCCESS 
+                providerTransactionId: fulfillmentResult.providerTransactionId || '',
+                providerRequestId: fulfillmentResult.providerRequestId || '',
+                status: fulfillmentResult.success
+                    ? FulfillmentStatusEnum.SUCCESS
                     : FulfillmentStatusEnum.FAILED,
                 amount: {
-                    ngn: vtPassResult.amount || transaction.amount.ngn,
-                    commission: vtPassResult.content?.transactions?.commission || 0,
-                    totalCharged: vtPassResult.content?.transactions?.total_amount || transaction.amount.ngn,
+                    ngn: fulfillmentResult.amount?.ngn || transaction.amount.ngn,
+                    commission: fulfillmentResult.amount?.commission || 0,
+                    totalCharged: fulfillmentResult.amount?.totalCharged || transaction.amount.ngn,
                 },
                 response: {
-                    rawResponse: vtPassResult,
+                    rawResponse: fulfillmentResult.rawResponse,
                 },
             }], { session });
 
             transaction.fulfillmentId = fulfillment[0]._id;
+            transaction.provider = fulfillmentResult.provider; // Update provider in case of fallback
             transaction.status = fulfillment[0].status === FulfillmentStatusEnum.SUCCESS
                 ? TransactionStatusEnum.SUCCESS
                 : TransactionStatusEnum.FAILED;
             transaction.fulfilledAt = new Date();
 
             if (fulfillment[0].status === FulfillmentStatusEnum.FAILED) {
-                transaction.failureReason = vtPassResult.response_description || 'Fulfillment failed';
+                transaction.failureReason = fulfillmentResult.failureReason || 'Fulfillment failed';
             }
 
             await transaction.save({ session });
@@ -262,8 +299,9 @@ export class TransactionService {
             // Invalidate cache after fulfillment
             CacheService.invalidateTransaction(transaction.reference);
 
-            logger.info('Service fulfilled successfully', {
+            logger.info('Service fulfillment step completed', {
                 reference: transaction.reference,
+                provider: fulfillmentResult.provider,
                 status: transaction.status,
             });
         } catch (error: any) {

@@ -2,7 +2,7 @@
 
 import mongoose, { Document } from 'mongoose';
 
-    import { IFulfillment, FulfillmentStatusEnum, ServiceTypeEnum } from '@shared/types';
+import { IFulfillment, FulfillmentStatusEnum, ServiceTypeEnum } from '@shared/types';
 
 export interface IFulfillmentDocument extends Omit<IFulfillment, '_id' | 'transactionId' | 'createdAt' | 'updatedAt'>, Document {
     _id: mongoose.Types.ObjectId;
@@ -12,11 +12,11 @@ export interface IFulfillmentDocument extends Omit<IFulfillment, '_id' | 'transa
 const fulfillmentSchema = new mongoose.Schema<IFulfillmentDocument>({
     transactionId: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction", required: true, index: true },
 
-    provider: { type: String, required: true, enum: ['VTPASS'] },
+    provider: { type: String, required: true, enum: ['VTPASS', 'PAYSCRIBE'] },
     serviceType: { type: String, required: true, enum: Object.values(ServiceTypeEnum) },
 
-    providerTransactionId: { type: String, required: true },
-    providerRequestId: { type: String, required: true },
+    providerTransactionId: { type: String, required: false },
+    providerRequestId: { type: String, required: false },
 
     status: { type: String, required: true, enum: Object.values(FulfillmentStatusEnum), index: true },
 

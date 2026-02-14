@@ -56,6 +56,15 @@ const promptCash = {
   SECRET_TOKEN: process.env.PROMPT_CASH_SECRET_TOKEN || '',
 };
 
+const payscribe = {
+  API_KEY: process.env.PAYSCRIBE_API_KEY || "",
+  API_URL: process.env.PAYSCRIBE_API_URL || "https://sandbox.payscribe.ng/api/v1",
+};
+
+const utility = {
+  DEFAULT_PROVIDER: (process.env.DEFAULT_UTILITY_PROVIDER as 'VTPASS' | 'PAYSCRIBE') || 'VTPASS',
+};
+
 // ipwho.org API key
 const ipwhoApiKey = process.env.IP_WHO_API_KEY;
 
@@ -77,4 +86,6 @@ export const config = {
   email,
   vtpass,
   promptCash,
+  payscribe,
+  utility,
 };

@@ -42,19 +42,19 @@ export interface IPayment {
   status: PaymentStatusEnum
 
   rawBlockchainPayload: object   // from mainnet.cash, prompt.cash
-  
+
   createdAt: Date
   updatedAt: Date
 }
 
 
 export enum InvoiceStatusEnum {
-    CREATED = "CREATED",
-    PAID = "PAID",
-    FULFILLING = "FULFILLING",
-    FULFILLED = "FULFILLED",
-    FAILED = "FAILED",
-    EXPIRED = "EXPIRED"
+  CREATED = "CREATED",
+  PAID = "PAID",
+  FULFILLING = "FULFILLING",
+  FULFILLED = "FULFILLED",
+  FAILED = "FAILED",
+  EXPIRED = "EXPIRED"
 }
 
 export interface IInvoice {
@@ -73,10 +73,10 @@ export interface IInvoice {
   }
   status: InvoiceStatusEnum;
   metaData: Record<string, any>; // phone number, network, airtime, plan etc...
-  
+
   createdAt: Date;
   updatedAt: Date;
-  
+
   paidAt?: Date | null;
   fulfilledAt?: Date | null;
 }
@@ -93,7 +93,7 @@ export interface IFulfillment {
   _id: string
   transactionId: string
 
-  provider: "VTPASS"
+  provider: "VTPASS" | "PAYSCRIBE"
   serviceType: ServiceTypeEnum
 
   providerTransactionId: string   // VTpass transactionId
@@ -143,8 +143,8 @@ export interface ITransaction {
   _id: string;
   reference: string
 
-  serviceType: ServiceTypeEnum 
-  provider: 'VTPASS' // todo: update to enum when we setup more providers
+  serviceType: ServiceTypeEnum
+  provider: 'VTPASS' | 'PAYSCRIBE'
 
   amount: {
     ngn: number
