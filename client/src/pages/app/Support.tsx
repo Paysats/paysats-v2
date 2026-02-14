@@ -19,7 +19,7 @@ export const Support = () => {
             >
                 {/* Title */}
                 <MotionDiv variants={staggerItemVariants} className="mb-8">
-                    <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+                    <h1 className="text-4xl capitalize md:text-5xl font-bold text-foreground mb-4">
                         {config.app.NAME} Support
                     </h1>
                     <p className="text-lg text-muted-foreground max-w-xl mx-auto">

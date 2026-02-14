@@ -22,6 +22,7 @@ export const Footer: FC = () => {
                 className="flex items-center justify-center gap-8"
                 variants={staggerItemVariants}
             >
+                <Link to="/roadmap" className="text-primary-600 hover:text-primary transition-colors">Roadmap</Link>
                 <Link to="/terms" className="text-primary-600 hover:text-primary transition-colors">Terms</Link>
                 <Link to="/privacy" className="text-primary-600 hover:text-primary transition-colors">Privacy</Link>
                 <Link to="/support" className="text-primary-600 hover:text-primary transition-colors">Support</Link>
