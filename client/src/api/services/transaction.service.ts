@@ -120,8 +120,17 @@ export const pollTransactionStatus = async (
     });
 };
 
+/**
+ * Retry fulfillment for a paid transaction
+ */
+export const retryFulfillment = async (reference: string): Promise<Transaction> => {
+    const response = await api.post<{ data: Transaction }>(`/payments/transaction/${reference}/retry`);
+    return response.data.data;
+};
+
 export const transactionService = {
     createAirtimeTransaction,
     getTransaction,
     pollTransactionStatus,
+    retryFulfillment,
 };

@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { PaymentFlowProvider, PaymentStepsEnum, usePaymentFlow } from "@/contexts/PaymentFlowContext";
 import type { PaymentData } from "@/contexts/PaymentFlowContext";
 import { AirtimeForm } from "../../components/app/payment/AirtimeForm";
-import { PaymentReview, PaymentQR, PaymentSuccess, ShareReceipt, Receipt } from "@/components/app/payment";
-import type { PaymentReviewData, PaymentQRData, PaymentSuccessData, ShareReceiptData, ReceiptData } from "@/components/app/payment";
+import { PaymentReview, PaymentQR, PaymentSuccess, PaymentFailure, ShareReceipt, Receipt } from "@/components/app/payment";
+import type { PaymentReviewData, PaymentQRData, PaymentSuccessData, PaymentFailureData, ShareReceiptData, ReceiptData } from "@/components/app/payment";
 import { transactionService } from "@/api/services/transaction.service";
 import type { Transaction } from "@/api/services/transaction.service";
 import { toast } from "react-next-toast";
@@ -49,7 +49,13 @@ const AirtimeFlowContent = () => {
                     setStep(PaymentStepsEnum.SUCCESS);
                 }
             } else if (txn.status === 'FAILED' || txn.status === 'EXPIRED') {
-                toast.error(txn.failureReason || 'Transaction failed.');
+                if (txn.paidAt) {
+                    // Paid but failed - show recovery UI
+                    setStep(PaymentStepsEnum.FAILURE);
+                } else {
+                    toast.error(txn.failureReason || 'Transaction failed.');
+                    resetFlow();
+                }
             }
         } catch (e) {
             console.error("Error updating transaction from socket event", e);
@@ -94,9 +100,13 @@ const AirtimeFlowContent = () => {
                     setStep('success');
                 } else if (txn.status === 'FAILED' || txn.status === 'EXPIRED') {
                     // Transaction failed or expired - reset flow
-                    toast.error(txn.failureReason || 'Transaction has failed. Please start a new transaction.');
-                    resetFlow();
-                    return;
+                    if (txn.paidAt) {
+                        setStep(PaymentStepsEnum.FAILURE);
+                    } else {
+                        toast.error(txn.failureReason || 'Transaction has failed. Please start a new transaction.');
+                        resetFlow();
+                        return;
+                    }
                 }
 
                 setSessionRestored(true);
@@ -302,22 +312,67 @@ const AirtimeFlowContent = () => {
                         // Force refresh transaction status
                         if (!paymentData.reference) return;
 
-                        const txn = await transactionService.getTransaction(paymentData.reference);
-                        setTransaction(txn);
+                        try {
+                            toast.info('Checking transaction status...');
+                            const txn = await transactionService.getTransaction(paymentData.reference, true);
+                            setTransaction(txn);
 
-                        if (txn.status === 'PENDING') {
-                            toast.info('Payment not detected yet. Please wait a moment.');
-                        } else if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
-                            toast.success('Payment detected! Processing your order...');
-                        } else if (txn.status === 'SUCCESS') {
-                            toast.success('Airtime delivered successfully!');
-                            setStep(PaymentStepsEnum.SUCCESS);
-                        } else {
-                            toast.error('Transaction status: ' + txn.status);
+                            if (txn.status === 'PAYMENT_PENDING' || txn.status === 'INITIATED') {
+                                toast.info('Payment not detected yet. Please wait a moment.');
+                            } else if (txn.status === 'PAYMENT_CONFIRMED' || txn.status === 'PROCESSING') {
+                                toast.success('Payment detected! Processing your order...');
+                            } else if (txn.status === 'SUCCESS') {
+                                toast.success('Airtime delivered successfully!');
+                                setStep(PaymentStepsEnum.SUCCESS);
+                            } else {
+                                toast.error('Transaction status: ' + txn.status);
+                            }
+                        } catch (error) {
+                            console.error('Error manually checking status:', error);
+                            toast.error('Failed to check status. Please try again.');
                         }
                     }}
                     onCancel={() => {
                         setStep('review');
+                    }}
+                />
+            </AppLayout>
+        );
+    }
+
+    if (currentStep === PaymentStepsEnum.FAILURE) {
+        const failureData: PaymentFailureData = {
+            serviceName: paymentData.serviceName,
+            title: "Fulfillment issue",
+            serviceProvider: paymentData.serviceProvider?.toUpperCase(),
+            amount: paymentData.amount,
+            bchAmount: paymentData.bchAmount,
+            transactionReference: paymentData.reference,
+            failureReason: transaction?.failureReason || 'Provider timeout',
+            paidAt: transaction?.paidAt ? new Date(transaction.paidAt).toLocaleString() : undefined,
+        };
+
+        return (
+            <AppLayout serviceTabs={false}>
+                <PaymentFailure
+                    data={failureData}
+                    onClose={handleDone}
+                    onRetry={async () => {
+                        if (!paymentData.reference) return;
+                        try {
+                            toast.info('Retrying fulfillment...');
+                            const txn = await transactionService.retryFulfillment(paymentData.reference);
+                            setTransaction(txn);
+                            if (txn.status === 'SUCCESS') {
+                                toast.success('Airtime delivered successfully! 🚀');
+                                setStep(PaymentStepsEnum.SUCCESS);
+                            } else {
+                                toast.error(txn.failureReason || 'Fulfillment still failing. Support has been notified.');
+                            }
+                        } catch (error) {
+                            console.error('Error retrying fulfillment:', error);
+                            toast.error('Failed to retry fulfillment. Please contact support.');
+                        }
                     }}
                 />
             </AppLayout>
