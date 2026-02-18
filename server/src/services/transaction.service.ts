@@ -349,4 +349,47 @@ export class TransactionService {
 
         return transaction;
     }
+    /**
+     * Sync transaction status with Prompt.cash
+     * Useful for manual "Check Status" to ensure we have latest blockchain info
+     */
+    static async syncWithProvider(reference: string) {
+        const transaction = await TransactionModel.findOne({ reference }).populate('paymentId');
+        if (!transaction) throw new Error('Transaction not found');
+
+        // only sync if not already final
+        if (transaction.status === TransactionStatusEnum.SUCCESS ||
+            transaction.status === TransactionStatusEnum.FAILED) {
+            return transaction;
+        }
+
+        logger.info(`Syncing transaction with Prompt.cash: ${reference}`);
+
+        try {
+            // force blockchain check, reconfirm status from prompt.cash
+            const promptPayment = await PromptCashService.getPayment(reference, true);
+
+            if (promptPayment.status === 'PAID') {
+                logger.info(`Manual sync detected payment for reference: ${reference}`);
+                // Use a separate session for confirmation to avoid locking
+                return await this.handlePaymentConfirmation(reference, promptPayment);
+            }
+
+            // always update confirmations
+            if (transaction.paymentId) {
+                await PaymentModel.findByIdAndUpdate(transaction.paymentId, {
+                    confirmations: promptPayment.confirmations || 0,
+                    rawBlockchainPayload: promptPayment
+                });
+            }
+
+            // Invalidate cache
+            CacheService.invalidateTransaction(reference);
+
+            return await this.getTransaction(reference);
+        } catch (error: any) {
+            logger.error(`Error syncing with Prompt.cash for ${reference}:`, error.message);
+            throw error;
+        }
+    }
 }

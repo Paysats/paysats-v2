@@ -55,7 +55,7 @@ export interface Transaction {
 export const createAirtimeTransaction = async (
     data: CreateAirtimeTransactionRequest
 ): Promise<CreateAirtimeTransactionResponse> => {
-    const response = await api.post<{ data: CreateAirtimeTransactionResponse} >(
+    const response = await api.post<{ data: CreateAirtimeTransactionResponse }>(
         '/payments/airtime',
         data
     );
@@ -65,8 +65,8 @@ export const createAirtimeTransaction = async (
 /**
  * Get transaction by reference
  */
-export const getTransaction = async (reference: string): Promise<Transaction> => {
-    const response = await api.get<{ data: Transaction }>(`/payments/transaction/${reference}`);
+export const getTransaction = async (reference: string, sync: boolean = false): Promise<Transaction> => {
+    const response = await api.get<{ data: Transaction }>(`/payments/transaction/${reference}${sync ? '?sync=true' : ''}`);
     return response.data.data;
 };
 
@@ -83,38 +83,38 @@ export const pollTransactionStatus = async (
     } = {}
 ): Promise<Transaction> => {
     const { interval = 3000, maxAttempts = 60 } = options; // Default: 3 seconds, max 3 minutes
-    
+
     let attempts = 0;
-    
+
     return new Promise((resolve, reject) => {
         const poll = async () => {
             try {
                 attempts++;
                 const transaction = await getTransaction(reference);
-                
+
                 // Call update callback
                 onUpdate(transaction);
-                
+
                 // Check if transaction is in final state
                 const finalStates = ['SUCCESS', 'FAILED', 'CANCELLED'];
                 if (finalStates.includes(transaction.status)) {
                     resolve(transaction);
                     return;
                 }
-                
+
                 // Check if max attempts reached
                 if (attempts >= maxAttempts) {
                     reject(new Error('Transaction polling timeout'));
                     return;
                 }
-                
+
                 // Schedule next poll
                 setTimeout(poll, interval);
             } catch (error) {
                 reject(error);
             }
         };
-        
+
         // Start polling
         poll();
     });

@@ -2,12 +2,13 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { getFromStorage, setInStorage, removeFromStorage, STORAGE_KEYS } from '@/utils/storage';
 
-export type PaymentStep = 'form' | 'review' | 'payment' | 'success' | 'share';
+export type PaymentStep = 'form' | 'review' | 'payment' | 'success' | 'failure' | 'share';
 export enum PaymentStepsEnum {
     FORM = 'form',
     REVIEW = 'review',
     PAYMENT = 'payment',
     SUCCESS = 'success',
+    FAILURE = 'failure',
     SHARE = 'share',
 }
 
@@ -60,7 +61,7 @@ interface PaymentFlowContextType {
 
 const PaymentFlowContext = createContext<PaymentFlowContextType | undefined>(undefined);
 
-const stepOrder: PaymentStep[] = ['form', 'review', 'payment', 'success', 'share'];
+const stepOrder: PaymentStep[] = ['form', 'review', 'payment', 'success', 'failure', 'share'];
 
 // Session expiry time (15 minutes)
 const SESSION_EXPIRY_MS = 15 * 60 * 1000;
@@ -93,11 +94,11 @@ export const PaymentFlowProvider = ({ children, serviceType = 'airtime' }: { chi
                     setIsRestoringSession(false);
                     return;
                 }
-                
+
                 // check if session has expired
                 const now = Date.now();
                 const age = now - savedState.timestamp;
-                
+
                 if (age > SESSION_EXPIRY_MS) {
                     console.log('Payment session expired, clearing...');
                     removeFromStorage(storageKey);

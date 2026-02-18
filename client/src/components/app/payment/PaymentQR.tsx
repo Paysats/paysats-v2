@@ -159,12 +159,10 @@ export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, onManualCheck, l
                         onClick={handleManualCheck}
                         disabled={checking}
                         className="text-sm"
+                        loading={checking}
                     >
                         {checking ? (
-                            <>
-                                <Loader2 className="animate-spin mr-2" size={14} />
-                                Checking...
-                            </>
+                            'Checking...'
                         ) : (
                             'Already Paid? Check Status'
                         )}

@@ -32,8 +32,14 @@ export class PaymentController {
      */
     static getTransaction = catchAsAsync(async (req: Request, res: Response) => {
         const { reference } = req.params;
+        const { sync } = req.query;
 
-        const transaction = await TransactionService.getTransaction(reference as string);
+        let transaction;
+        if (sync === 'true') {
+            transaction = await TransactionService.syncWithProvider(reference as string);
+        } else {
+            transaction = await TransactionService.getTransaction(reference as string);
+        }
 
         return sendSuccess({
             res,
