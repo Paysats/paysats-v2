@@ -6,6 +6,7 @@ import healthRoutes from "./routes/health.routes"
 import paymentRoutes from "./routes/payment.routes"
 import webhookRoutes from "./routes/webhook.routes"
 import rateRoutes from "./routes/rate.routes"
+import adminRoutes from "./routes/admin.routes"
 
 import { connectDatabase } from "./config/database"
 import cookieParser from "cookie-parser"
@@ -52,6 +53,9 @@ app.use("/api/v1/payments", paymentRoutes);
 
 // rate conversion routes
 app.use("/api/v1/rates", rateRoutes);
+
+// admin routes
+app.use("/api/v1/admin", adminRoutes);
 
 // webhook routes (no auth required)
 app.use("/webhooks", webhookRoutes);
