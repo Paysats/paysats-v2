@@ -11,4 +11,9 @@ router.post("/airtime", validate(PaymentValidator.purchaseAirtime), PaymentContr
 // Get transaction details
 router.get("/transaction/:reference", PaymentController.getTransaction);
 
+/**
+ * Retry fulfillment for a paid transaction
+ */
+router.post("/transaction/:reference/retry", PaymentController.retryFulfillment);
+
 export default router;

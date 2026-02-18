@@ -47,4 +47,19 @@ export class PaymentController {
             message: "Transaction retrieved successfully"
         });
     });
+
+    /**
+     * Retry fulfillment for a paid transaction
+     */
+    static retryFulfillment = catchAsAsync(async (req: Request, res: Response) => {
+        const { reference } = req.params;
+
+        const transaction = await TransactionService.retryFulfillment(reference as string);
+
+        return sendSuccess({
+            res,
+            data: transaction,
+            message: "Fulfillment retry-push triggered successfully"
+        });
+    });
 }
