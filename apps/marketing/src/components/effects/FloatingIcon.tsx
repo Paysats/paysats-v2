@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useFloating } from '@/hooks/useAnimations';
-import { prefersReducedMotion } from '@/config/animationConfig';
+import { useFloating } from '@shared/hooks/useAnimations';
+
 import type { ReactNode } from 'react';
+import { prefersReducedMotion } from '@shared/config/animationConfig';
 
 interface FloatingIconProps {
     children: ReactNode;

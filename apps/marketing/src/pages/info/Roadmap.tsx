@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppLayout } from "@/layouts/AppLayout";
 import { MotionDiv } from "@shared-ui/MotionComponents";
-import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig";
+import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig";
 import { CheckCircle2, Circle } from "lucide-react";
 import { cn } from "@shared/utils/cn";
 

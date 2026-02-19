@@ -1,23 +1,18 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { ConfigProvider, theme } from 'antd'
-import { Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './contexts/ThemeContext';
-import { Homepage } from './pages/landing/home';
 import { isAppSubdomain } from '../../../packages/shared/utils/isAppSubdomain';
-import NotFound from './pages/NotFound';
-import { AppRoutes } from './routes/AppRoutes';
 import { MarketingRoutes } from './routes/MarketingRoutes';
-import { PWAInstallPrompt } from './components/app/PWAInstallPrompt';
+import { PWAInstallPrompt } from '../../../packages/shared/src/components/PWAInstallPrompt';
 
 function App() {
   const [mounted, setMounted] = useState(false);
 
   const isApp = isAppSubdomain();
 
-  // Dark mode is default, can be toggled later with a theme context
+  // dark mode default
   useEffect(() => {
-    // Ensure light class is not present (dark is default)
+    // ensure light class is not present (dark is default)
     document.documentElement.classList.remove('light');
   }, []);
 
@@ -38,13 +33,7 @@ function App() {
         algorithm: theme.defaultAlgorithm,
       }}
     >
-      {
-        isApp ? (
-          <AppRoutes />
-        ) : (
-          <MarketingRoutes />
-        )
-      }
+      <MarketingRoutes />
       <PWAInstallPrompt />
     </ConfigProvider>
   )

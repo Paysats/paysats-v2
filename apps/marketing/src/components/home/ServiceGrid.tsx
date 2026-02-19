@@ -6,7 +6,7 @@ import { ServiceCard } from "./ServiceCard"
 import { Link } from "react-router-dom"
 import { Tooltip } from "antd"
 import { MotionDiv } from "@shared/ui/MotionComponents"
-import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig"
+import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig"
 import type { IconType } from "react-icons/lib";
 
 const ICON_MAP: Record<string, LucideIcon | IconType> = {

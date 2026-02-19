@@ -2,7 +2,7 @@ import { Tooltip } from "antd"
 import { Lock, type LucideIcon } from "lucide-react"
 import type { FC } from "react"
 import { MotionDiv } from "@shared/ui/MotionComponents"
-import { scaleHoverVariants, pulseVariants } from "@/config/animationConfig"
+import { scaleHoverVariants, pulseVariants } from "@shared/config/animationConfig"
 import { FloatingIcon } from "../effects/FloatingIcon"
 import { GlowEffect } from "../effects/GlowEffect"
 import type { IconType } from "react-icons/lib";

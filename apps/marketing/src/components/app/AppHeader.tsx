@@ -1,4 +1,5 @@
-import { slideDownVariants } from "@/config/animationConfig"
+
+import { slideDownVariants } from "@shared/config/animationConfig"
 import { Logo } from "@shared/ui/Logo"
 import { MotionDiv } from "@shared/ui/MotionComponents"
 

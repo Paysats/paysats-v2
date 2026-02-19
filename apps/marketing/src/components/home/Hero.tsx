@@ -1,7 +1,7 @@
 import { Bitcoin } from "lucide-react"
 import type { FC } from "react"
 import { MotionDiv, MotionH1, MotionP } from "@shared/ui/MotionComponents"
-import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig"
+import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig"
 import { FloatingIcon } from "../effects/FloatingIcon"
 
 export const Hero: FC = () => {

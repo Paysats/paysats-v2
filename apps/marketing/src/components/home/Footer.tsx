@@ -1,7 +1,7 @@
 import type { FC } from "react"
 import { Link } from "react-router-dom"
 import { MotionFooter, MotionP, MotionDiv } from "@shared/ui/MotionComponents"
-import { staggerContainerVariants, staggerItemVariants, fadeInVariants } from "@/config/animationConfig"
+import { staggerContainerVariants, staggerItemVariants, fadeInVariants } from "@shared/config/animationConfig"
 
 export const Footer: FC = () => {
     return (

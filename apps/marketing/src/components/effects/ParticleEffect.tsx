@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import { useParticles } from '@/hooks/useAnimations';
-import { prefersReducedMotion } from '@/config/animationConfig';
+import { useParticles } from '@shared/hooks/useAnimations';
+import { prefersReducedMotion } from '@shared/config/animationConfig';
 
 interface ParticleEffectProps {
     count?: number;
@@ -10,7 +10,7 @@ interface ParticleEffectProps {
 
 export const ParticleEffect: React.FC<ParticleEffectProps> = ({
     count = 20,
-    color = 'rgba(255, 165, 0, 0.6)', 
+    color = 'rgba(255, 165, 0, 0.6)',
     className = '',
 }) => {
     const particles = useParticles(count);

@@ -7,7 +7,7 @@ import {
     floatingVariants,
     prefersReducedMotion,
     getVariants,
-} from '@/config/animationConfig';
+} from '@shared/config/animationConfig';
 
 /**
  * Hook for page transition animations

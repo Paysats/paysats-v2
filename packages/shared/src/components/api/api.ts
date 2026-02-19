@@ -1,4 +1,4 @@
-import { config } from '@/config/config';
+import { config } from '@shared/config/config';
 import { STORAGE_KEYS } from '@shared/utils';
 import axios from 'axios';
 

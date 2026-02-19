@@ -1,5 +1,5 @@
 import { MotionHeader } from "@shared/ui/MotionComponents"
-import { slideDownVariants } from "@/config/animationConfig"
+import { slideDownVariants } from "@shared/config/animationConfig"
 import { Logo } from "@shared/ui/Logo"
 
 export const Header = () => {

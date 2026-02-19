@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MotionDiv, MotionButton } from "@shared/ui/MotionComponents";
-import { usePWA } from '@/hooks/usePWA';
+import { usePWA } from '@shared/hooks/usePWA';
 import { Logo } from '@shared/ui/Logo';
 import { X, Download, Smartphone } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';

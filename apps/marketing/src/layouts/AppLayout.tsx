@@ -1,9 +1,8 @@
 import { AppFooter } from "@/components/app/AppFooter"
 import { AppHeader } from "@/components/app/AppHeader"
-import ServiceTabs from "@/components/app/ServiceTabs"
 import type { ReactNode } from "react"
 import { MotionMain } from "@shared-ui/MotionComponents"
-import { pageTransitionVariants } from "@/config/animationConfig"
+import { pageTransitionVariants } from "@shared/config/animationConfig"
 import { AnimatePresence } from "framer-motion"
 
 interface AppLayoutProps {
@@ -17,11 +16,6 @@ export const AppLayout = ({ children, serviceTabs = true }: AppLayoutProps) => {
             <div className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/60 border-b border-border/40 transition-all duration-200">
                 <div className="max-w-3xl mx-auto w-full">
                     <AppHeader />
-                    {serviceTabs && (
-                        <div className="pb-2">
-                            <ServiceTabs />
-                        </div>
-                    )}
                 </div>
             </div>
 

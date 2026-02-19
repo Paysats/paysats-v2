@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@source "../../../../packages/shared/**/*.{ts,tsx,js,jsx}";
+@source "../../../packages/shared/**/*.{ts,tsx,js,jsx}";
 
 
 

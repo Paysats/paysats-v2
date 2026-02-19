@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { prefersReducedMotion } from '@/config/animationConfig';
+import { prefersReducedMotion } from '@shared/config/animationConfig';
 import type { ReactNode } from 'react';
 
 interface GlowEffectProps {

@@ -1,6 +1,6 @@
 import { AppLayout } from "@/layouts/AppLayout";
 import { MotionDiv } from "@shared-ui/MotionComponents";
-import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig";
+import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig";
 
 export const TermsOfService = () => {
     return (

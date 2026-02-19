@@ -1,7 +1,7 @@
 import { Lock, Mail } from "lucide-react"
 import { Link } from "react-router-dom"
 import { FaXTwitter } from "react-icons/fa6"
-import { config } from "@/config/config"
+import { config } from "@shared/config/config"
 
 export const AppFooter = () => {
     return (

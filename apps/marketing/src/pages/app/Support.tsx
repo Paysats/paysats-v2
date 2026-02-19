@@ -1,17 +1,17 @@
 import { Logo } from "@shared-ui/Logo";
 import { Mail, MessageCircle, Clock } from "lucide-react";
 import { MotionDiv } from "@shared-ui/MotionComponents";
-import { staggerContainerVariants, staggerItemVariants } from "@/config/animationConfig";
+import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig";
 import { FaXTwitter } from "react-icons/fa6";
 import { Divider } from "antd";
-import { config } from "@/config/config";
 import { AppLayout } from "@/layouts/AppLayout";
+import { config } from "@shared/config/config";
 
 export const Support = () => {
     return (
         <AppLayout serviceTabs={false}>
 
-        <MotionDiv
+            <MotionDiv
                 className="flex-grow flex flex-col items-center justify-center max-w-2xl mx-auto w-full px-4 text-center"
                 variants={staggerContainerVariants}
                 initial="initial"
@@ -23,12 +23,12 @@ export const Support = () => {
                         {config.app.NAME} Support
                     </h1>
                     <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-                        Have a question or run into an issue? Our team is ready to assist you. 
+                        Have a question or run into an issue? Our team is ready to assist you.
                         Reach out to us for assistance with payments or general inquiries.
                     </p>
                 </MotionDiv>
 
-                <MotionDiv 
+                <MotionDiv
                     variants={staggerItemVariants}
                     className="flex flex-col gap-6 w-full max-w-md"
                 >
@@ -37,31 +37,31 @@ export const Support = () => {
                         variants={staggerItemVariants}
                     >
 
-                        <a 
+                        <a
                             href={`mailto:${config.app.SUPPORT_EMAIL}`}
                             className="text-2xl md:text-3xl font-bold text-primary hover:text-primary/80 transition-colors"
-                            >
+                        >
                             {config.app.SUPPORT_EMAIL}
                         </a>
-                            </MotionDiv>
+                    </MotionDiv>
 
-<Divider className="-mt-2! -mb-2!"/>
+                    <Divider className="-mt-2! -mb-2!" />
                     {/* twitter */}
                     <MotionDiv
                         variants={staggerItemVariants}
                     >
                         <div className="flex items-center justify-center gap-3 mb-4">
                             <FaXTwitter className="text-primary" size={24} />
-                            <a 
-                            href={`https://x.com/${config.app.X_HANDLE}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors"
-                        >
-                            @{config.app.X_HANDLE}
-                        </a>
+                            <a
+                                href={`https://x.com/${config.app.X_HANDLE}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors"
+                            >
+                                @{config.app.X_HANDLE}
+                            </a>
                         </div>
-                        
+
                         <p className="text-sm text-muted-foreground mt-2">
                             DM us for quick support
                         </p>
@@ -69,7 +69,7 @@ export const Support = () => {
                 </MotionDiv>
 
                 {/* Response Time */}
-                <MotionDiv 
+                <MotionDiv
                     variants={staggerItemVariants}
                     className="mt-8 flex items-center gap-2 text-muted-foreground"
                 >
