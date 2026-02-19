@@ -1,4 +1,5 @@
 import mongoose, { Document } from 'mongoose';
+import { BCHRateService } from '@/services/bchRate.service';
 
 export interface ISettingsDocument extends Document {
     services: {
@@ -7,6 +8,7 @@ export interface ISettingsDocument extends Document {
         electricity: boolean;
         cable: boolean;
         flights: boolean;
+        hotels: boolean;
     };
     rates: {
         bchNgn: number;
@@ -21,6 +23,7 @@ const settingsSchema = new mongoose.Schema<ISettingsDocument>({
         electricity: { type: Boolean, default: true },
         cable: { type: Boolean, default: true },
         flights: { type: Boolean, default: false },
+        hotels: { type: Boolean, default: false },
     },
     rates: {
         bchNgn: { type: Number, default: 0 },
@@ -38,16 +41,24 @@ export const SettingsModel = mongoose.model<ISettingsDocument>('Settings', setti
 export async function getSettings() {
     let settings = await SettingsModel.findOne();
     if (!settings) {
+        let initialRate = 1500000;
+        try {
+            initialRate = await BCHRateService.getBCHToNGNRate();
+        } catch (error) {
+            console.error('Failed to fetch initial BCH rate, using default 1.5M', error);
+        }
+
         settings = await SettingsModel.create({
             services: {
                 airtime: true,
                 data: true,
                 electricity: true,
                 cable: true,
-                flights: false
+                flights: false,
+                hotels: false
             },
             rates: {
-                bchNgn: 1500000, // Example default
+                bchNgn: initialRate,
                 lastUpdated: new Date()
             }
         });

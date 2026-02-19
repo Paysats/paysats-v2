@@ -10,8 +10,9 @@
   ],
   "scripts": {
     "dev:marketing": "npm run dev -w apps/marketing",
+    "dev:platform": "npm run dev -w apps/platform",
     "dev:server": "npm run dev -w server",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:marketing\"",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:marketing\" \"npm run dev:platform\"",
     "build:server": "npm run build -w server",
     "build:marketing": "npm run build -w apps/marketing",
     "build": "npm run build -w server && npm run build -w apps/marketing",
