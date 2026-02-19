@@ -1,10 +1,16 @@
+/// <reference types="node" />
 import { NodeEnv } from "@shared/types";
 
 const getEnv = (key: string, defaultValue: string = ''): string => {
-  if (typeof import.meta.env !== 'undefined') {
-    return import.meta.env[key] || defaultValue;
+  if (typeof import.meta.env !== 'undefined' && import.meta.env[key]) {
+    return import.meta.env[key];
   }
-  return process.env[key] || defaultValue;
+
+  try {
+    return process.env[key] || defaultValue;
+  } catch {
+    return defaultValue;
+  }
 };
 
 const NODE_ENVIRONMENT = (getEnv('NODE_ENV') as NodeEnv) || NodeEnv.DEVELOPMENT;
