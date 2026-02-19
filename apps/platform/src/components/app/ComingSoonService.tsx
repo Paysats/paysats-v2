@@ -1,9 +1,10 @@
-import { AppLayout } from '@/layouts/AppLayout';
-import React from 'react'
-import { SERVICE_ITEMS } from './ServiceTabs';
+import React from 'react';
+import { SERVICES } from '@shared/constants';
+import * as LucideIcons from 'lucide-react';
+import { BiTv } from "react-icons/bi";
 import { Link } from 'react-router-dom';
 import { Button } from '@shared/ui/Button';
-
+import { AppLayout } from '@/layouts/AppLayout';
 
 interface IComingSoonServiceProps {
     serviceName: string;
@@ -18,7 +19,12 @@ const ComingSoonService: React.FC<IComingSoonServiceProps> = ({ serviceName, mai
                 <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-primary/10 flex items-center justify-center mb-8">
                     {
                         (() => {
-                            const Icon = SERVICE_ITEMS.find(item => item.route === serviceName.toLowerCase())?.icon;
+                            const service = SERVICES.find(item => item.route === serviceName.toLowerCase() || item.id === serviceName.toLowerCase());
+                            if (!service) return null;
+
+                            let Icon: any = (LucideIcons as any)[service.icon] || LucideIcons.HelpCircle;
+                            if (service.id === 'cable') Icon = BiTv;
+
                             return Icon ? <Icon className="w-16 h-16 text-primary" /> : null;
                         })()
                     }

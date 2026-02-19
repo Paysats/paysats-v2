@@ -1,24 +1,23 @@
-import { SERVICES } from "@shared/constants"
-import { Smartphone, Wifi, Zap, Monitor, Plane, type LucideIcon, Hotel } from "lucide-react"
+import { DOMAIN_URLS, SERVICES } from "@shared/constants"
+import { usePublicSettings, useSettingsStore } from "@shared/hooks/usePublicSettings"
+import * as LucideIcons from "lucide-react"
 import { BiTv } from "react-icons/bi";
-import type { FC } from "react"
+import { type FC, useEffect } from "react"
 import { ServiceCard } from "./ServiceCard"
 import { Link } from "react-router-dom"
 import { Tooltip } from "antd"
 import { MotionDiv } from "@shared/ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig"
-import type { IconType } from "react-icons/lib";
+import { config } from "@shared/config/config";
 
-const ICON_MAP: Record<string, LucideIcon | IconType> = {
-    "airtime": Smartphone,
-    "data": Wifi,
-    "electricity bill": Zap,
-    "cable tv": BiTv,
-    "flight booking": Plane,
-    "hotel booking": Hotel,
-}
 
 export const ServiceGrid: FC = () => {
+    const { settings, fetchSettings } = usePublicSettings(`${config.app.API_URL}/config/public`);
+
+    useEffect(() => {
+        fetchSettings();
+    }, [fetchSettings]);
+
     return (
         <MotionDiv
             className="flex flex-wrap justify-center gap-6 md:gap-10 pt-8 md:py-12"
@@ -27,18 +26,24 @@ export const ServiceGrid: FC = () => {
             animate="animate"
         >
             {SERVICES.map((service) => {
-                const Icon = ICON_MAP[service.name.toLowerCase()] || Wifi;
+                // determine active state from db , fallback to hardcoded isActive
+                const isBackendActive = settings?.services ? (settings.services as any)[service.id] : service.isActive;
+
+                // Get Icon
+                let Icon: any = (LucideIcons as any)[service.icon] || LucideIcons.Wifi;
+                if (service.id === 'cable') Icon = BiTv; // special case for react-icons
+
                 return (
                     <MotionDiv
-                        key={service.name}
+                        key={service.id}
                         variants={staggerItemVariants}
                     >
-                        <Tooltip title={service.isActive ? "" : "Coming Soon"} placement="top">
-                            <Link to={service.isActive ? `/${service.route}` : "#"} >
+                        <Tooltip title={isBackendActive ? "" : "Coming Soon"} placement="top">
+                            <Link to={isBackendActive ? `${DOMAIN_URLS.PLATFORM}/${service.route}` : "#"} >
                                 <ServiceCard
                                     title={service.name}
                                     icon={Icon}
-                                    isActive={service.isActive}
+                                    isActive={isBackendActive}
                                 />
                             </Link>
                         </Tooltip>

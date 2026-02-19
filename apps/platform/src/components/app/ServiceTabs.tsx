@@ -1,47 +1,24 @@
-import React, { useState } from 'react'
-import { Smartphone, Wifi, Zap, Plane, Hotel, type LucideIcon } from 'lucide-react'
+import { SERVICES } from '@shared/constants';
+import { usePublicSettings, useSettingsStore } from '@shared/hooks/usePublicSettings';
+import * as LucideIcons from 'lucide-react';
 import { BiTv } from "react-icons/bi";
-
+import { type FC, useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@shared/utils/cn';
 import { MotionDiv } from "@shared/ui/MotionComponents"
 import { springConfigs } from '@shared/config/animationConfig';
-import type { IconType } from 'react-icons/lib';
+import { Lock, type LucideIcon } from "lucide-react"
 
-export const SERVICE_ITEMS: { name: string; icon: LucideIcon | IconType; route: string }[] = [
-    {
-        name: "Airtime",
-        icon: Smartphone,
-        route: "airtime",
-    },
-    {
-        name: "Data",
-        icon: Wifi,
-        route: "data",
-    },
-    {
-        name: "Electricity",
-        icon: Zap,
-        route: "electricity",
-    },
-    {
-        name: "Cable TV",
-        icon: BiTv,
-        route: "cable-tv",
-    },
-    {
-        name: "Flight Booking",
-        icon: Plane,
-        route: "flights",
-    },
-    {
-        name: "Hotels",
-        icon: Hotel,
-        route: "hotels",
-    },
-]
+import { config } from '@shared/config/config';
+
+const API_URL = config.app.API_URL || "http://localhost:8000";
 
 const ServiceTabs = () => {
+    const { settings, fetchSettings } = usePublicSettings(API_URL);
+
+    useEffect(() => {
+        fetchSettings();
+    }, [fetchSettings]);
 
     const location = useLocation();
     const currentRoute = location.pathname.split("/")[1];
@@ -52,18 +29,25 @@ const ServiceTabs = () => {
         <div className="w-full mx-auto flex items-center overflow-x-auto py-2 px-4 no-scrollbar scroll-smooth">
             <div className="grid grid-cols-3 md:flex items-center gap-3 mx-auto md:gap-4">
                 {
-                    SERVICE_ITEMS.map((item) => {
-                        const isActive = activeRoute === item.route;
+                    SERVICES.map((service) => {
+                        const isActive = activeRoute === service.route;
+                        const isBackendActive = settings?.services ? (settings.services as any)[service.id] : service.isActive;
+
+                        // icon mapping
+                        let Icon: any = (LucideIcons as any)[service.icon] || LucideIcons.HelpCircle;
+                        if (service.id === 'cable') Icon = BiTv;
+
                         return (
                             <Link
-                                to={`/${item.route}`}
-                                key={item.name}
+                                to={isBackendActive ? `/${service.route}` : `/coming-soon?service=${service.id}`}
+                                key={service.id}
                                 className={cn(
                                     "relative flex flex-col items-center justify-center gap-1.5 py-2.5 px-4 rounded-2xl transition-all duration-300 min-w-[72px] md:min-w-[96px]",
                                     "hover:bg-primary/5 active:scale-95",
-                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                                    !isBackendActive && "opacity-60 grayscale-[0.5]"
                                 )}
-                                onMouseEnter={() => setHoveredTab(item.route)}
+                                onMouseEnter={() => setHoveredTab(service.route)}
                                 onMouseLeave={() => setHoveredTab(null)}
                                 tabIndex={0}
                             >
@@ -75,7 +59,7 @@ const ServiceTabs = () => {
                                     />
                                 )}
 
-                                {hoveredTab === item.route && !isActive && (
+                                {hoveredTab === service.route && !isActive && (
                                     <MotionDiv
                                         layoutId="hoverTab"
                                         className="absolute inset-0 bg-secondary/50 rounded-2xl"
@@ -90,9 +74,18 @@ const ServiceTabs = () => {
                                     "relative z-10 flex flex-col items-center gap-1.5 transition-colors duration-300",
                                     isActive ? "text-primary font-bold" : "text-muted-foreground/80 font-medium group-hover:text-foreground"
                                 )}>
-                                    <item.icon size={22} className={cn("transition-all duration-300", isActive ? "stroke-[2.5] scale-110" : "stroke-2")} />
-                                    <span className="text-[10px] md:text-xs whitespace-nowrap text-center tracking-tight">{item.name}</span>
+                                    <Icon size={22} className={cn("transition-all duration-300", isActive ? "stroke-[2.5] scale-110" : "stroke-2")} />
+                                    <span className="text-[10px] md:text-xs whitespace-nowrap text-center tracking-tight">{service.name}</span>
                                 </span>
+
+                                {!isBackendActive && (
+                                    <div className="absolute -top-1 -right-1">
+                                        <Lock
+                                            size={15}
+                                            className="text-[#B5C7C0] stroke-2"
+                                        />
+                                    </div>
+                                )}
 
                                 {isActive && (
                                     <MotionDiv
