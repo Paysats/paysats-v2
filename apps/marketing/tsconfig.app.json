@@ -43,7 +43,6 @@
     }
   },
   "include": [
-    "src",
-    "../../packages/shared"
+    "src"
   ]
 }

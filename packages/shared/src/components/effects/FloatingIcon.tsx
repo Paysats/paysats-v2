@@ -1,7 +1,7 @@
 import React from 'react';
 import { MotionDiv } from "@shared/ui/MotionComponents"
-import { useFloating } from '../../hooks/useAnimations';
-import { cn } from '../../lib/utils';
+import { useFloating } from '@shared/hooks/useAnimations';
+import { cn } from '@shared/utils/cn';
 
 interface FloatingIconProps {
     icon: React.ReactNode;

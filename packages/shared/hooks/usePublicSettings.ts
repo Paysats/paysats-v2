@@ -64,10 +64,10 @@ export const useSettingsStore = create<PublicSettingsState>((set, get) => ({
  * @param apiUrl - The base URL of the API
  */
 export const usePublicSettings = (apiUrl?: string) => {
-    const settings = useSettingsStore((state) => state.settings);
-    const isLoading = useSettingsStore((state) => state.isLoading);
-    const error = useSettingsStore((state) => state.error);
-    const fetchSettingsRaw = useSettingsStore((state) => state.fetchSettings);
+    const settings = useSettingsStore((state: PublicSettingsState) => state.settings);
+    const isLoading = useSettingsStore((state: PublicSettingsState) => state.isLoading);
+    const error = useSettingsStore((state: PublicSettingsState) => state.error);
+    const fetchSettingsRaw = useSettingsStore((state: PublicSettingsState) => state.fetchSettings);
 
     const fetchSettings = useCallback(() => {
         if (!apiUrl) {
