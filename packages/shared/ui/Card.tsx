@@ -77,6 +77,7 @@ export const Card = ({
     <AntCard
       className={cn(cardStyles)}
       title={
+        title &&
         <span className="text-base font-semibold text-foreground">{title}</span>
       }
       extra={extra}

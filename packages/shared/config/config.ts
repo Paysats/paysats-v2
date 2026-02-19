@@ -1,14 +1,21 @@
 import { NodeEnv } from "@shared/types";
 
-const NODE_ENVIRONMENT = (import.meta.env.NODE_ENV as NodeEnv) || NodeEnv.DEVELOPMENT;
+const getEnv = (key: string, defaultValue: string = ''): string => {
+  if (typeof import.meta.env !== 'undefined') {
+    return import.meta.env[key] || defaultValue;
+  }
+  return process.env[key] || defaultValue;
+};
+
+const NODE_ENVIRONMENT = (getEnv('NODE_ENV') as NodeEnv) || NodeEnv.DEVELOPMENT;
 
 // app config export
 const app = {
-  NAME: import.meta.env.VITE_APP_NAME || "PaySats",
-  FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || "http://localhost:3000",
-  API_URL: import.meta.env.VITE_API_URL || "http://localhost:8000",
-  SUPPORT_EMAIL: import.meta.env.VITE_SUPPORT_EMAIL || "support@trypaysats.xyz",
-  X_HANDLE: import.meta.env.VITE_X_HANDLE || "paysatss",
+  NAME: getEnv('VITE_APP_NAME', 'PaySats'),
+  FRONTEND_URL: getEnv('VITE_FRONTEND_URL', 'http://localhost:3000'),
+  API_URL: getEnv('VITE_API_URL', 'http://localhost:8000'),
+  SUPPORT_EMAIL: getEnv('VITE_SUPPORT_EMAIL', 'support@trypaysats.xyz'),
+  X_HANDLE: getEnv('VITE_X_HANDLE', 'paysatss'),
 }
 
 export const config = {
