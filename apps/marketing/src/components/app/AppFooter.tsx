@@ -21,14 +21,14 @@ export const AppFooter = () => {
 
                     {/* Center: Links */}
                     <div className="flex items-center gap-6 text-sm">
-                        <Link 
-                            to="/app/support" 
+                        <Link
+                            to="/app/support"
                             className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
                         >
                             <Mail size={14} />
                             Support
                         </Link>
-                        <a 
+                        <a
                             href={`https://x.com/${config.app.X_HANDLE}`}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -41,7 +41,7 @@ export const AppFooter = () => {
 
                     {/* Right: Copyright */}
                     <div className="text-sm text-muted-foreground">
-                        © {new Date().getFullYear()} Paysats.io
+                        © {new Date().getFullYear()} trypaysats.xyz
                     </div>
                 </div>
             </div>
