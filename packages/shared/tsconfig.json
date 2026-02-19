@@ -11,7 +11,7 @@
       "vite/client",
       "node"
     ],
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "composite": true,
