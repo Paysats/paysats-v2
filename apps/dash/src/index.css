@@ -1,0 +1,189 @@
+@import "tailwindcss";
+@source "../../../packages/shared/**/*.{ts,tsx,js,jsx}";
+
+
+@theme {
+  /* Fonts */
+  --font-dmSans: "DM Sans", sans-serif;
+  --font-sans: var(--font-dmSans);
+  --font-mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+
+  /* Border Radius */
+  --radius-lg: 1rem;
+  --radius-md: calc(1rem - 2px);
+  --radius-sm: calc(1rem - 6px);
+
+  /* Colors */
+
+  --color-background: #f6f8f7;
+  /* soft off-white / pale mint background */
+  --color-foreground: #2C4A3A;
+  /* green-tinted dark text (not pure black) */
+  --color-card: #FFFFFF;
+  /* plain white for card-like elements */
+  --color-card-foreground: var(--color-foreground);
+  /* foreground text for cards */
+  --color-primary: #33C279;
+  /* Mint / Bitcoin Cash green for primary buttons, highlights */
+
+  /* Various shades of primary */
+  --color-primary-100: #E6F7F0;
+  --color-primary-200: #BFF0D6;
+  --color-primary-300: #99E8BC;
+  --color-primary-400: #4DDC8A;
+  --color-primary-500: #33C279;
+  --color-primary-600: #2A9E5F;
+  --color-primary-700: #1F7A46;
+  --color-primary-800: #14542E;
+  --color-primary-900: #0A2B17;
+
+  --color-primary-foreground: #FFFFFF;
+  /* white text on primary buttons */
+
+  --color-secondary: #E0F2E9;
+  /* lighter pale mint for secondary elements/input backgrounds */
+  --color-secondary-foreground: var(--color-foreground);
+  /* text color for secondary elements */
+
+  --color-muted: #D3E7DB;
+  /* muted green-gray for secondary text/borders */
+  --color-muted-foreground: #708A7C;
+  /* muted green-gray secondary text */
+  --color-secondary-text: #708A7C;
+  /* muted green-gray secondary text (alias) */
+
+  --color-accent: #33C279;
+  /* mint green for highlights */
+  --color-accent-foreground: #FFFFFF;
+  /* white text on accent elements */
+
+  --color-destructive: #E64E4E;
+  /* subtle red for warnings/errors */
+  --color-destructive-foreground: #FFFFFF;
+  /* white text on destructive elements */
+
+  --color-border: #9CC9B0;
+  /* soft mint borders */
+  --color-input: #E0F2E9;
+  /* lighter pale mint for input backgrounds */
+  --color-ring: #33C279;
+  /* Focus ring with primary color */
+}
+
+
+/* Dark Mode (Optional Override - only when .dark class is added) */
+.dark {
+  /* Based on: Primary brand color as a highlight, darker neutrals, similar tone */
+  --color-background: #1A2C2A;
+  /* Dark green-tinted background */
+  --color-foreground: #E0F2E9;
+  /* Pale mint text */
+  --color-card: #2A3E3C;
+  /* Darker green-tinted card equivalent */
+  --color-card-foreground: var(--color-foreground);
+  --color-primary: #33C279;
+  /* Mint / Bitcoin Cash green remains primary */
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #2A3E3C;
+  /* Darker secondary elements */
+  --color-secondary-foreground: var(--color-foreground);
+  --color-muted: #3D5754;
+  /* Dark muted tones */
+  --color-muted-foreground: #A0B9B6;
+  /* Lighter muted text */
+  --color-secondary-text: #A0B9B6;
+  /* Lighter muted text */
+  --color-accent: #33C279;
+  /* Mint green for highlights */
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive: #9C3B3B;
+  /* Darker, subtle red */
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #4F706D;
+  /* Darker mint borders */
+  --color-input: #3D5754;
+  /* Dark input backgrounds */
+  --color-ring: #33C279;
+  /* Focus ring with primary color */
+}
+
+/* Base Styles */
+:root {
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+/* Make code elements use Fira Code by default (ligatures enabled where supported). */
+code,
+pre,
+kbd,
+samp,
+tt {
+  font-family: var(--font-mono);
+  font-variant-ligatures: contextual;
+  font-feature-settings: "liga" 1, "calt" 1;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+/* Inline code styling */
+code {
+  background: color-mix(in srgb, var(--color-foreground) 5%, transparent);
+  padding: 0.15em 0.35em;
+  border-radius: 6px;
+  font-size: 0.95em;
+}
+
+/* Gradient text utility */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* browser ovverride  autofill styles to prevent the background color change on input */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: var(--color-foreground) !important;
+  -webkit-box-shadow: 0 0 0 30px var(--color-background, #fff) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* dark mode
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--color-foreground) !important;
+  -webkit-box-shadow: 0 0 0 30px var(--color-background, #1A2C2A) inset !important;
+}
