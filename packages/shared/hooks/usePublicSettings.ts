@@ -26,7 +26,7 @@ interface PublicSettingsState {
 }
 
 // Global store instance
-export const useSettingsStore = create<PublicSettingsState>((set, get) => ({
+export const useSettingsStore = create<PublicSettingsState>((set: any, get: any) => ({
     settings: null,
     isLoading: false,
     error: null,
