@@ -6,6 +6,12 @@ export const APP_NAME = 'paysats';
 export const APP_DOMAIN = 'trypaysats.xyz';
 export const APP_URL = `https://${APP_DOMAIN}`;
 
+export const DOMAIN_URLS = {
+    LANDING: import.meta.env.VITE_LANDING_URL || "http://localhost:3000",
+    PLATFORM: import.meta.env.VITE_PLATFORM_URL || "http://localhost:3001",
+    DASH: import.meta.env.DASHBOARD_URL || "http://localhost:3002"
+}
+
 export const USERNAME_REGEX = /^[a-z0-9_-]{3,30}$/;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 30;

@@ -7,7 +7,7 @@ const app = {
   NAME: import.meta.env.VITE_APP_NAME || "PaySats",
   FRONTEND_URL: import.meta.env.VITE_FRONTEND_URL || "http://localhost:3000",
   API_URL: import.meta.env.VITE_API_URL || "http://localhost:8000",
-  SUPPORT_EMAIL: import.meta.env.VITE_SUPPORT_EMAIL || "support@paysats.io",
+  SUPPORT_EMAIL: import.meta.env.VITE_SUPPORT_EMAIL || "support@trypaysats.xyz",
   X_HANDLE: import.meta.env.VITE_X_HANDLE || "paysatss",
 }
 
