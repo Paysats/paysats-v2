@@ -1,7 +1,7 @@
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import logger from '@/utils/logger';
-import { config } from '@shared/config/config';
+import { config } from '@/config/config';
 
 let io: Server;
 

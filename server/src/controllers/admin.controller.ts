@@ -7,6 +7,7 @@ import { responseHandler, sendSuccess, throwResponse } from '../utils/responseHa
 import { catchAsAsync } from '../utils/catchAsAsync';
 import logger from '../utils/logger';
 import { TransactionService } from '../services/transaction.service';
+import { BCHRateService } from '@/services/bchRate.service';
 
 export class AdminController {
     /**
@@ -210,10 +211,15 @@ export class AdminController {
      * Update manual exchange rate
      */
     static updateRate = catchAsAsync(async (req: Request, res: Response) => {
-        const { rate } = req.body;
+        let { rate } = req.body;
+
+        if (!rate) {
+            // auto sync with market
+            rate = await BCHRateService.getBCHToNGNRate();
+        }
 
         const settings = await getSettings();
-        settings.rates.bchNgn = rate;
+        settings.rates.bchNgn = Number(rate);
         settings.rates.lastUpdated = new Date();
         await settings.save();
 
