@@ -10,8 +10,8 @@ import logger from '@/utils/logger';
 import mongoose from 'mongoose';
 import { config } from '@/config/config';
 
-const APP_BASE_URL = config.app.APP_BASE_URL || 'https://app.paysats.io';
-const API_BASE_URL = config.app.API_BASE_URL || 'https://api.paysats.io';
+const APP_BASE_URL = config.app.APP_BASE_URL || 'https://app.trypaysats.xyz';
+const API_BASE_URL = config.app.API_BASE_URL || 'https://api.trypaysats.xyz';
 
 export interface ICreateAirtimeTransactionParams {
     network: string;

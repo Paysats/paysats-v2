@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import logger, { loggers } from '../utils/logger';
 import { config } from './config';
-import { NodeEnv } from '../../../shared/types/environment.types';
+import { NodeEnv } from '@shared/types';
 
 
 // MongoDB connection options
@@ -23,24 +23,24 @@ export const connectDatabase = async (): Promise<void> => {
     mongoose.connection.on('disconnected', () => {
       loggers.db.disconnected();
     });
-    
+
     mongoose.connection.on('error', (error: Error) => {
       loggers.db.error(error);
     });
-    
+
     mongoose.connection.on('reconnected', () => {
       logger.info('📊 Database reconnected');
     });
-    
+
   } catch (error) {
     loggers.db.error(error as Error);
-    
+
     // Exit process in production if DB connection fails
     if (config.NODE_ENVIRONMENT === NodeEnv.PRODUCTION) {
       logger.error('💥 Fatal: Unable to connect to database in production. Exiting...');
       process.exit(1);
     }
-    
+
     throw error;
   }
 };

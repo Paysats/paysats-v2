@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { NodeEnv } from '../../../shared/types/environment.types';
+import { NodeEnv } from '@shared/types';
 const { combine, timestamp, printf, colorize, errors, json } = winston.format;
 
 // Console log format
