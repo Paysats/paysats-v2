@@ -22,7 +22,7 @@ export const useTheme = () => {
 };
 
 
-export const AuthProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider: FC<{ children: React.ReactNode }> = ({ children }) => {
 
 
     const [theme, setTheme] = useState<"light" | "dark">("dark");
