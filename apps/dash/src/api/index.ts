@@ -3,7 +3,7 @@ import { useDashAuthStore } from '../store/dashAuthStore';
 import { config } from '@shared/config/config';
 
 const api = axios.create({
-    baseURL: `${config.app.API_URL}/api/v1/admin`,
+    baseURL: `${config.app.API_URL}/admin`,
     headers: {
         'Content-Type': 'application/json',
     },
