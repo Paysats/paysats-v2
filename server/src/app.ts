@@ -8,6 +8,7 @@ import webhookRoutes from "./routes/webhook.routes"
 import rateRoutes from "./routes/rate.routes"
 import adminRoutes from "./routes/admin.routes"
 import configRoutes from "./routes/config.routes"
+import utilityRoutes from "./routes/utility.routes"
 
 import { connectDatabase } from "./config/database"
 import cookieParser from "cookie-parser"
@@ -30,8 +31,8 @@ initSocketService(server);
 app.use(cors({
     origin: [
         config.app.FRONTEND_URL,
-        `*.${config.app.FRONTEND_URL}`, // subdomains
-        "*paysats*", // TODO: remove this and subdomain above to the correct domain address once we purchase domain and configure
+        `dash.${config.app.FRONTEND_URL}`,
+        `app.${config.app.FRONTEND_URL}`,
         "http://localhost:3002"],
     optionsSuccessStatus: 200,
     credentials: true,
@@ -68,6 +69,9 @@ app.use("/webhooks", webhookRoutes);
 
 // config routes (public)
 app.use("/api/v1/config", configRoutes);
+
+// utility routes
+app.use("/api/v1/utility", utilityRoutes);
 
 // Root endpoint
 app.get('/', (_req, res) => {
