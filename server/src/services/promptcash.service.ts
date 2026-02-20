@@ -63,6 +63,41 @@ export interface ICreatePaymentResponse {
  */
 export class PromptCashService {
     /**
+     * Helper to retry a function with exponential backoff
+     */
+    private static async withRetry<T>(
+        operation: () => Promise<T>,
+        tx_id: string,
+        maxAttempts: number = 3,
+        baseDelay: number = 2000
+    ): Promise<T> {
+        let lastError: any;
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return await operation();
+            } catch (error: any) {
+                lastError = error;
+
+                // don't retry if it's a 4xx error (except 429)
+                if (error.response?.status && error.response.status >= 400 && error.response.status < 500 && error.response.status !== 429) {
+                    throw error;
+                }
+
+                if (attempt < maxAttempts) {
+                    const delay = baseDelay * Math.pow(2, attempt - 1);
+                    logger.warn(`Prompt.cash API attempt ${attempt} failed, retrying in ${delay}ms...`, {
+                        tx_id,
+                        error: error.message,
+                        status: error.response?.status
+                    });
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+        throw lastError;
+    }
+
+    /**
      * Create a new payment on Prompt.cash
      */
     static async createPayment(params: ICreatePaymentParams): Promise<ICreatePaymentResponse> {
@@ -70,7 +105,7 @@ export class PromptCashService {
             throw new Error('PROMPT_CASH_PUBLIC_TOKEN is not configured');
         }
 
-        try {
+        return this.withRetry(async () => {
             const time = Math.floor(Date.now() / 1000);
             const requestParams: any = {
                 token: PROMPT_CASH_PUBLIC_TOKEN,
@@ -101,13 +136,11 @@ export class PromptCashService {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'Authorization': `${PROMPT_CASH_SECRET_TOKEN}`,
                     },
+                    timeout: 10000, // 10s timeout
                 }
             );
 
             const responseData = response.data;
-
-            console.log("prompt.cash payment response:", response?.data);
-            console.log("prompt.cash payment data:", responseData);
 
             logger.info('Prompt.cash payment created successfully', {
                 tx_id: params.tx_id,
@@ -117,15 +150,7 @@ export class PromptCashService {
             });
 
             return response.data;
-        } catch (error: any) {
-            console.log('Error creating Prompt.cash payment', error);
-            logger.error('Error creating Prompt.cash payment', {
-                tx_id: params.tx_id,
-                error: error?.message,
-                response: error?.response?.data,
-            });
-            throw error;
-        }
+        }, params.tx_id);
     }
 
     /**
@@ -136,23 +161,18 @@ export class PromptCashService {
             throw new Error('PROMPT_CASH_SECRET_TOKEN is not configured');
         }
 
-        try {
+        return this.withRetry(async () => {
             const url = `${PROMPT_CASH_API_BASE_URL}/get-payment/${tx_id}${force ? '?force=true' : ''}`;
 
             const response = await axios.get<{ data: IPromptCashPayment }>(url, {
                 headers: {
                     Authorization: PROMPT_CASH_SECRET_TOKEN,
                 },
+                timeout: 5000, // 5s timeout
             });
 
             return response.data.data;
-        } catch (error: any) {
-            logger.error('Error getting Prompt.cash payment', {
-                tx_id,
-                error: error?.message,
-            });
-            throw error;
-        }
+        }, tx_id);
     }
 
     /**
@@ -189,14 +209,14 @@ export class PromptCashService {
 
         // Check if the token in the payload matches our secret token (root level)
         const tokenInPayload = payload.token;
-        
+
         if (!tokenInPayload) {
             logger.error('Missing token in webhook payload');
             return false;
         }
 
         const isValid = tokenInPayload === PROMPT_CASH_SECRET_TOKEN;
-        
+
         if (!isValid) {
             logger.error('Token mismatch in webhook payload', {
                 receivedToken: tokenInPayload?.substring(0, 10) + '...',
