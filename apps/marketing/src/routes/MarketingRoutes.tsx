@@ -5,6 +5,7 @@ import { Support } from "@/pages/app/Support";
 
 import { TermsOfService } from "@/pages/legal/TermsOfService";
 import { PrivacyPolicy } from "@/pages/legal/PrivacyPolicy";
+import Roadmap from "@/pages/info/Roadmap";
 
 export function MarketingRoutes() {
   return (
@@ -13,6 +14,7 @@ export function MarketingRoutes() {
       <Route path="/support" element={<Support />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/roadmap" element={<Roadmap />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
