@@ -21,7 +21,7 @@ const app = {
   FRONTEND_URL: getEnv('VITE_FRONTEND_URL', 'http://localhost:3000'),
   API_URL: getEnv('VITE_API_URL', 'http://localhost:8000/api/v1'),
   SUPPORT_EMAIL: getEnv('VITE_SUPPORT_EMAIL', 'support@trypaysats.xyz'),
-  X_HANDLE: getEnv('VITE_X_HANDLE', 'paysatss'),
+  X_HANDLE: getEnv('VITE_X_HANDLE', 'trypaysats'),
 }
 
 export const config = {
