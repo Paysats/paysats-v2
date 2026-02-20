@@ -1,3 +1,4 @@
+// @ts-ignore
 import React from 'react';
 import { Form as AntForm } from 'antd';
 import type { FormProps as AntFormProps, FormItemProps as AntFormItemProps } from 'antd';
