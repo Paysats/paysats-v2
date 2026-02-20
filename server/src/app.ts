@@ -85,7 +85,6 @@ app.get('/', (_req, res) => {
 
 // 404 handler
 app.use((_req, res) => {
-    console.log("request ==>", _req)
     return responseHandler.notFound(
         res,
         "The requested resource was not found."

@@ -8,7 +8,7 @@ export interface IAirtimePurchaseParams {
 export interface IDataPurchaseParams {
     network: string;
     phoneNumber: string;
-    planId: string;
+    planCode: string;
     amount: number;
     reference: string;
 }
@@ -31,4 +31,5 @@ export interface IUtilityProvider {
     name: 'VTPASS' | 'PAYSCRIBE';
     purchaseAirtime(params: IAirtimePurchaseParams): Promise<IFulfillmentResult>;
     purchaseData(params: IDataPurchaseParams): Promise<IFulfillmentResult>;
+    getDataPlans(network: string): Promise<any>;
 }

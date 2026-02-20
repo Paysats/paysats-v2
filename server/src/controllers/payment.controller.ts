@@ -28,6 +28,30 @@ export class PaymentController {
     });
 
     /**
+     * create data purchase transaction
+     * returns payment details (bch address, qr code etc)
+     */
+    static purchaseData = catchAsAsync(async (req: Request, res: Response) => {
+        const { network, phoneNumber, planCode, amount } = req.body;
+
+        console.log("Received purchaseData request with body:", req.body);
+
+        // create transaction and get payment details
+        const result = await TransactionService.createDataTransaction({
+            network,
+            phoneNumber,
+            planCode,
+            amount
+        });
+
+        return sendSuccess({
+            res,
+            data: result,
+            message: "Transaction created successfully. Please complete payment."
+        });
+    });
+
+    /**
      * Get transaction details by reference
      */
     static getTransaction = catchAsAsync(async (req: Request, res: Response) => {

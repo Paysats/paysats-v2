@@ -11,7 +11,8 @@ export class PayscribeProvider implements IUtilityProvider {
 
     private async postRequest(endpoint: string, body: Record<string, any>) {
         const headers = {
-            'Authorization': `Bearer ${apiKey}`
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
         };
 
         try {
@@ -21,6 +22,20 @@ export class PayscribeProvider implements IUtilityProvider {
             return response.data;
         } catch (error: any) {
             logger.error('Payscribe Provider POST Error:', error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    private async getRequest(endpoint: string, params: Record<string, any>) {
+        const headers = {
+            'Authorization': `Bearer ${apiKey}`
+        };
+
+        try {
+            const response = await axios.get(`${PAYSCRIBE_API_BASE_URL}${endpoint}`, { headers, params });
+            return response.data;
+        } catch (error: any) {
+            logger.error('Payscribe Provider GET Error:', error.response?.data || error.message);
             throw error;
         }
     }
@@ -39,12 +54,6 @@ export class PayscribeProvider implements IUtilityProvider {
             const response = await this.postRequest('/airtime', body);
 
             const isSuccess = response.status === true;
-
-            logger.info('PayscribeProvider: Airtime purchase result', {
-                success: isSuccess,
-                ref: params.reference,
-                description: response.description
-            });
 
             return {
                 success: isSuccess,
@@ -72,7 +81,7 @@ export class PayscribeProvider implements IUtilityProvider {
         logger.info('PayscribeProvider: Purchasing data', { params });
 
         const body = {
-            plan: params.planId,
+            plan: params.planCode,
             recipient: params.phoneNumber,
             network: params.network.toLowerCase(),
             ref: params.reference
@@ -81,12 +90,6 @@ export class PayscribeProvider implements IUtilityProvider {
         try {
             const response = await this.postRequest('/data/vend', body);
             const isSuccess = response.status === true;
-
-            logger.info('PayscribeProvider: Data purchase result', {
-                success: isSuccess,
-                ref: params.reference,
-                description: response.description
-            });
 
             return {
                 success: isSuccess,
@@ -107,6 +110,38 @@ export class PayscribeProvider implements IUtilityProvider {
                 failureReason: error.message,
                 rawResponse: error.response?.data || error
             };
+        }
+    }
+
+    async getDataPlans(network: string): Promise<any> {
+        const endpoint = '/data/lookup';
+        const params = { network: network.toLowerCase() };
+
+        try {
+            const response = await this.getRequest(endpoint, params);
+
+            if (response.status === true) {
+                const details = response.message?.details;
+                let rawPlans = [];
+
+                if (Array.isArray(details) && details.length > 0) {
+                    rawPlans = details[0].plans || [];
+                } else if (details && typeof details === 'object') {
+                    rawPlans = details.plans || [];
+                }
+
+                return rawPlans.map((p: any) => ({
+                    planCode: p.plan_code,
+                    name: p.name,
+                    amount: parseFloat(p.amount || p.variation_amount || '0'),
+                    duration: p.duration || p.validity || ''
+                }));
+            }
+
+            throw new Error(response.description || 'Failed to fetch data plans');
+        } catch (error: any) {
+            logger.error('Payscribe Provider getDataPlans Error:', error.response?.data || error.message);
+            throw error;
         }
     }
 }

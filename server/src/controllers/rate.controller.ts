@@ -10,19 +10,20 @@ export class RateController {
      */
     static getBCHRate = catchAsAsync(async (_req: Request, res: Response) => {
         try {
-            const rate = await BCHRateService.getBCHToNGNRate();
+            const rates = await BCHRateService.getBCHRate();
 
             const data = {
-                rate,
-                    currency: 'NGN',
-                    blockchain: 'BCH',
-                    timestamp: new Date().toISOString(),
+                rate: rates.ngn,
+                usdRate: rates.usd,
+                currency: 'NGN',
+                blockchain: 'BCH',
+                timestamp: new Date().toISOString(),
             }
 
             return sendSuccess({
                 res,
                 data,
-                message: 'BCH rate fetched successfully',
+                message: 'BCH rates fetched successfully',
             });
         } catch (error: any) {
             logger.error('Error fetching BCH rate', { error: error?.message });

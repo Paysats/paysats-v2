@@ -22,7 +22,7 @@ export interface ICreateAirtimeTransactionParams {
 export interface ICreateDataTransactionParams {
     network: string;
     phoneNumber: string;
-    planId: string;
+    planCode: string;
     amount: number;
 }
 
@@ -257,7 +257,7 @@ export class TransactionService {
                     network: transaction.serviceMeta.network,
                     phoneNumber: transaction.serviceMeta.phone,
                     amount: transaction.amount.ngn,
-                    planId: transaction.serviceMeta.planId,
+                    planCode: transaction.serviceMeta.planCode,
                     reference: transaction.reference
                 });
             } else {
@@ -349,6 +349,106 @@ export class TransactionService {
 
         return transaction;
     }
+    static async createDataTransaction(params: ICreateDataTransactionParams) {
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+            if (!params.network || !params.phoneNumber || !params.planCode || !params.amount) {
+                throw new Error('Missing required parameters');
+            }
+
+            const bchRate = await BCHRateService.getBCHToNGNRate();
+            const amountBCH = await BCHRateService.convertNGNToBCH(params.amount);
+            const amountSats = BCHRateService.bchToSats(amountBCH);
+            const reference = this.generateReference(ServiceTypeEnum.DATA);
+
+            const transaction = await TransactionModel.create([{
+                reference,
+                serviceType: ServiceTypeEnum.DATA,
+                provider: config.utility.DEFAULT_PROVIDER,
+                amount: {
+                    ngn: params.amount,
+                    bch: amountBCH,
+                    rate: bchRate,
+                },
+                serviceMeta: {
+                    phone: params.phoneNumber,
+                    network: params.network,
+                    planCode: params.planCode,
+                },
+                status: TransactionStatusEnum.INITIATED,
+            }], { session });
+
+            const txDoc = transaction[0];
+
+            const promptCashPayment = await PromptCashService.createPayment({
+                tx_id: reference,
+                amount: amountBCH,
+                currency: 'BCH',
+                desc: `Paysats Data - ${params.network} - ${params.phoneNumber}`,
+                callback: `${API_BASE_URL}/webhooks/promptcash`,
+                return: `${APP_BASE_URL}/app/transaction/${reference}`,
+                expiration: 10,
+                confirm: 0,
+            });
+
+            const payment = await PaymentModel.create([{
+                transactionId: txDoc._id,
+                blockchain: 'BCH',
+                address: promptCashPayment.payment.address,
+                amountBch: amountBCH,
+                amountSats,
+                status: PaymentStatusEnum.PENDING,
+                confirmations: 0,
+                rawBlockchainPayload: promptCashPayment,
+            }], { session });
+
+            await TransactionModel.findByIdAndUpdate(
+                txDoc._id,
+                {
+                    paymentId: payment[0]._id,
+                    status: TransactionStatusEnum.PAYMENT_PENDING,
+                },
+                { session }
+            );
+
+            await session.commitTransaction();
+
+            logger.info('Data transaction created successfully', {
+                reference,
+                amount: params.amount,
+                bchAmount: amountBCH,
+                address: promptCashPayment.payment.address,
+            });
+
+            return {
+                transaction: {
+                    reference,
+                    serviceType: ServiceTypeEnum.DATA,
+                    amount: {
+                        ngn: params.amount,
+                        bch: amountBCH,
+                        rate: bchRate,
+                    },
+                    status: TransactionStatusEnum.PAYMENT_PENDING,
+                },
+                payment: {
+                    address: promptCashPayment.payment.address,
+                    amountBCH,
+                    qrUrl: promptCashPayment.payment.qr_url,
+                    paymentLink: promptCashPayment.payment.payment_link,
+                },
+            };
+        } catch (error: any) {
+            await session.abortTransaction();
+            logger.error('Error creating data transaction', { error: error?.message });
+            throw error;
+        } finally {
+            session.endSession();
+        }
+    }
+
     /**
      * Sync transaction status with Prompt.cash
      * Useful for manual "Check Status" to ensure we have latest blockchain info

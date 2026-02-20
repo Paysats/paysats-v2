@@ -22,7 +22,7 @@ const transactionSchema = new Schema<ITransactionDocument>({
     serviceMeta: {
         phone: { type: String, required: true },
         network: { type: String, required: true },
-        planId: { type: String, default: null },
+        planCode: { type: String, default: null },
     },
 
     paymentId: {

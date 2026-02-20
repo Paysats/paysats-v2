@@ -8,6 +8,9 @@ const router = Router();
 // Create airtime purchase transaction
 router.post("/airtime", validate(PaymentValidator.purchaseAirtime), PaymentController.purchaseAirtime);
 
+// create data purchase transaction
+router.post("/data", PaymentController.purchaseData);
+
 // Get transaction details
 router.get("/transaction/:reference", PaymentController.getTransaction);
 

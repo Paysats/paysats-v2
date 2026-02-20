@@ -7,68 +7,54 @@ import { CacheService, CACHE_KEYS, CACHE_TTL } from './cache.service';
  */
 export class BCHRateService {
     /**
-     * Get BCH to NGN exchange rate
+     * Get BCH rates (NGN and USD)
      * Uses centralized cache service with 5-minute TTL
-     * CRITICAL: No fallback rates - fails if API is unavailable
      */
-    static async getBCHToNGNRate(): Promise<number> {
+    static async getBCHRate(): Promise<{ ngn: number; usd: number }> {
         const cacheKey = CACHE_KEYS.bchRate();
 
         try {
-            // Use getOrSet pattern - will fetch if not cached or expired
-            const rate = await CacheService.getOrSet<number>(
+            return await CacheService.getOrSet<{ ngn: number; usd: number }>(
                 cacheKey,
                 async () => {
-                    logger.info('Fetching fresh BCH/NGN rate from CoinGecko');
+                    logger.info('Fetching fresh BCH rates from CoinGecko');
 
-                    // Fetch from CoinGecko API
                     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
                         params: {
                             ids: 'bitcoin-cash',
-                            vs_currencies: 'ngn',
+                            vs_currencies: 'ngn,usd',
                         },
-                        timeout: 10000, // 10 second timeout
+                        timeout: 10000,
                     });
 
-                    const rate = response.data['bitcoin-cash']?.ngn;
+                    const ngn = response.data['bitcoin-cash']?.ngn;
+                    const usd = response.data['bitcoin-cash']?.usd;
 
-                    if (!rate || typeof rate !== 'number' || rate <= 0) {
-                        throw new Error('Invalid BCH/NGN rate received from CoinGecko');
+                    if (!ngn || !usd) {
+                        throw new Error('Invalid BCH rates received from CoinGecko');
                     }
 
-                    logger.info('Fetched fresh BCH/NGN rate', { rate, source: 'CoinGecko' });
-                    return rate;
+                    return { ngn, usd };
                 },
                 CACHE_TTL.BCH_RATE
             );
-
-            if (!rate || rate <= 0) {
-                throw new Error('Invalid rate from cache');
-            }
-
-            return rate;
         } catch (error: any) {
-            logger.error('CRITICAL: Failed to fetch BCH/NGN rate', {
-                error: error?.message,
-                stack: error?.stack
-            });
+            logger.error('CRITICAL: Failed to fetch BCH rates', { error: error?.message });
 
-            // Only use expired cache as last resort (within reasonable time window)
-            const cachedRate = CacheService.get<number>(cacheKey);
-            if (cachedRate && cachedRate > 0) {
-                logger.warn('using recently expired cached rate due to API error', {
-                    rate: cachedRate,
-                    warning: 'this should only happen during temporary API outages'
-                });
-                return cachedRate;
-            }
+            // fallback to last cached value if avail
+            const cached = CacheService.get<{ ngn: number; usd: number }>(cacheKey);
+            if (cached) return cached;
 
-            // Better to reject transaction than use wrong price
-            throw new Error(
-                'Unable to fetch BCH exchange rate. Please try again in a few moments. ' +
-                'If this persists, our exchange rate provider may be experiencing issues.'
-            );
+            throw error;
         }
+    }
+
+    /**
+     * get bch to ngn exchange rate
+     */
+    static async getBCHToNGNRate(): Promise<number> {
+        const rates = await this.getBCHRate();
+        return rates.ngn;
     }
 
     /**
