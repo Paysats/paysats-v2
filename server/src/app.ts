@@ -30,10 +30,15 @@ initSocketService(server);
 // cors
 app.use(cors({
     origin: [
+        `https://${config.app.FRONTEND_URL}`,
+        `https://dash.${config.app.FRONTEND_URL}`,
+        `https://app.${config.app.FRONTEND_URL}`,
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        // also allow the base if it has no protocol (legacy/internal)
         config.app.FRONTEND_URL,
-        `dash.${config.app.FRONTEND_URL}`,
-        `app.${config.app.FRONTEND_URL}`,
-        "http://localhost:3002"],
+    ],
     optionsSuccessStatus: 200,
     credentials: true,
 }))
@@ -97,27 +102,11 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 })
 
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-    server.listen(PORT, () => {
-        logger.info(`Server running on port ${PORT}`);
-        logger.info(`Environment: ${process.env.NODE_ENV}`);
-        logger.info(`Server started at: http://localhost:${PORT}`);
-    });
-}
-
-// // start server
-// const startServer = async () => {
-//     try {
-//         await connectDatabase()
-//         app.listen(PORT, () => {
-//             loggers.server.started(Number(PORT), config.NODE_ENVIRONMENT);
-//         })
-//     } catch (error) {
-//         console.error("Error starting server:", error)
-//     }
-// }
-
-// startServer()
+// Start server
+server.listen(PORT, '0.0.0.0', () => {
+    logger.info(`Server running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+    logger.info(`Server started at: http://0.0.0.0:${PORT}`);
+});
 
 export default app

@@ -28,7 +28,7 @@ export const getBCHRate = async (): Promise<BCHRate> => {
  */
 export const convertNGNToBCH = async (amount: number): Promise<ConversionResult> => {
     const response = await api.get<{ data: ConversionResult }>(`/rates/convert/ngn-to-bch?amount=${amount}`);
-    console.log("convertNGNToBCH response:", response.data);
+
     return response.data.data;
 };
 
