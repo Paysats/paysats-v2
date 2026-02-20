@@ -39,7 +39,7 @@ const ServiceTabs = () => {
 
                         return (
                             <Link
-                                to={isBackendActive ? `/${service.route}` : `/coming-soon?service=${service.id}`}
+                                to={`/${service.route}`}
                                 key={service.id}
                                 className={cn(
                                     "relative flex flex-col items-center justify-center gap-1.5 py-2.5 px-4 rounded-2xl transition-all duration-300 min-w-[72px] md:min-w-[96px]",
