@@ -63,7 +63,7 @@ export interface IInvoice {
   serviceMeta: {
     phone: string
     network: string
-    planId?: string
+    planCode?: string
   };
 
   amount: {
@@ -155,7 +155,7 @@ export interface ITransaction {
   serviceMeta: {
     phone: string
     network: string
-    planId?: string
+    planCode?: string
   }
 
   paymentId: string | null

@@ -25,6 +25,32 @@ export interface CreateAirtimeTransactionResponse {
     };
 }
 
+export interface CreateDataTransactionRequest {
+    network: string;
+    phoneNumber: string;
+    planCode: string;
+    amount: number;
+}
+
+export interface CreateDataTransactionResponse {
+    transaction: {
+        reference: string;
+        serviceType: string;
+        amount: {
+            ngn: number;
+            bch: number;
+            rate: number;
+        };
+        status: string;
+    };
+    payment: {
+        address: string;
+        amountBCH: number;
+        qrUrl: string;
+        paymentLink: string;
+    };
+}
+
 export interface Transaction {
     reference: string;
     serviceType: string;
@@ -57,6 +83,19 @@ export const createAirtimeTransaction = async (
 ): Promise<CreateAirtimeTransactionResponse> => {
     const response = await api.post<{ data: CreateAirtimeTransactionResponse }>(
         '/payments/airtime',
+        data
+    );
+    return response.data.data;
+};
+
+/**
+ * Create data purchase transaction
+ */
+export const createDataTransaction = async (
+    data: CreateDataTransactionRequest
+): Promise<CreateDataTransactionResponse> => {
+    const response = await api.post<{ data: CreateDataTransactionResponse }>(
+        '/payments/data',
         data
     );
     return response.data.data;
@@ -130,6 +169,7 @@ export const retryFulfillment = async (reference: string): Promise<Transaction> 
 
 export const transactionService = {
     createAirtimeTransaction,
+    createDataTransaction,
     getTransaction,
     pollTransactionStatus,
     retryFulfillment,

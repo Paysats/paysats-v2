@@ -1,17 +1,18 @@
-import { useState, useMemo, type FC } from "react"
+import { useState, useMemo, useEffect, type FC } from "react"
 import { AppLayout } from "@/layouts/AppLayout"
 import { Button } from "@shared-ui/Button"
 import { Form, FormItem } from "@shared-ui/Form"
 import { Input, SearchInput } from "@shared-ui/Input"
 import { Modal } from "@shared-ui/Modal"
 import { NETWORK_PROVIDERS } from "@shared/utils/networkProviders"
-import { DATA_PLANS } from "@shared/utils/dataPlans"
 import type { DataPlanVariation } from "@shared/utils/dataPlans"
 import { Bitcoin, PhoneCall, ChevronRight, Wifi } from "lucide-react"
 import { TbCurrencyNaira } from "react-icons/tb"
 import { MotionDiv } from "@shared-ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants, cardHoverVariants } from "@shared/config/animationConfig"
 import type { NetworkProviderEnum } from "@shared/types/network-provider.types"
+import { UtilityService } from "@/api/services/utility.service"
+import type { DataPlan } from "@/api/services/utility.service"
 
 interface DataFormProps {
     handleContinue: (data: any) => void;
@@ -23,20 +24,40 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
     const [selectedNetwork, setSelectedNetwork] = useState<NetworkProviderEnum | null>(null);
     const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedPlan, setSelectedPlan] = useState<DataPlanVariation | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState<DataPlan | null>(null);
+    const [fetchedPlans, setFetchedPlans] = useState<DataPlan[]>([]);
+    const [fetchingPlans, setFetchingPlans] = useState(false);
 
     const amount = Form.useWatch('amount', form);
     const phoneNumber = Form.useWatch('phoneNumber', form);
 
+    useEffect(() => {
+        if (!selectedNetwork) return;
+
+        const fetchPlans = async () => {
+            setFetchingPlans(true);
+            try {
+                const plans = await UtilityService.getDataPlans(selectedNetwork);
+                setFetchedPlans(plans);
+            } catch (error) {
+                console.error("Error fetching plans:", error);
+            } finally {
+                setFetchingPlans(false);
+            }
+        };
+
+        fetchPlans();
+    }, [selectedNetwork]);
+
     const plans = useMemo(() => {
-        if (!selectedNetwork) return [];
-        const networkPlans = DATA_PLANS[selectedNetwork?.toLowerCase()] || [];
-        console.log({ networkPlans, searchQuery, selectedNetwork })
-        if (!searchQuery) return networkPlans;
-        return networkPlans.filter(plan =>
+        if (!fetchedPlans) return [];
+        if (!searchQuery) return fetchedPlans;
+        return fetchedPlans.filter(plan =>
             plan.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
-    }, [selectedNetwork, searchQuery]);
+    }, [fetchedPlans, searchQuery]);
+
+    const enablePreviewConversion = false;
 
     const onFinish = (values: any) => {
         const data = {
@@ -44,27 +65,25 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
             network: selectedNetwork,
             plan: selectedPlan
         };
-        console.log("Data Order ====> ", data);
         handleContinue(data);
     };
 
-    const handlePlanSelect = (plan: DataPlanVariation) => {
+    const handlePlanSelect = (plan: DataPlan) => {
         setSelectedPlan(plan);
-        form.setFieldValue('plan', plan.variation_code);
-        form.setFieldValue('amount', plan.variation_amount);
+        form.setFieldValue('plan', plan.planCode);
+        form.setFieldValue('amount', plan.amount);
         setIsPlanModalOpen(false);
     };
-
 
     return (
         <AppLayout>
             <MotionDiv
-                className="flex flex-col gap-2"
+                className="flex flex-col gap-4"
                 variants={staggerContainerVariants}
                 initial="initial"
                 animate="animate"
             >
-                <MotionDiv variants={staggerItemVariants}>
+                <MotionDiv className="flex flex-col gap-3" variants={staggerItemVariants}>
                     <h2 className="text-2xl md:text-4xl font-bold">
                         Buy Data
                     </h2>
@@ -73,7 +92,6 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                     </p>
                 </MotionDiv>
 
-
                 <Form
                     form={form}
                     onFinish={onFinish}
@@ -81,7 +99,7 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                     className="flex flex-col"
                 >
                     {/* select network */}
-                    <MotionDiv className="flex flex-col gap-4 mb-4 mt-2" variants={staggerItemVariants}>
+                    <MotionDiv className="flex flex-col gap-4 mt-1" variants={staggerItemVariants}>
                         <h3 className="text-lg font-semibold">
                             Select Network
                         </h3>
@@ -154,7 +172,7 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                                 {selectedPlan ? (
                                     <div className="flex flex-col py-1">
                                         <span className="font-semibold text-base">{selectedPlan.name}</span>
-                                        <span className="text-xs text-muted-foreground">₦{selectedPlan.variation_amount}</span>
+                                        <span className="text-xs text-muted-foreground">₦{selectedPlan.amount}</span>
                                     </div>
                                 ) : (
                                     <span className="text-muted-foreground font-medium">
@@ -176,26 +194,32 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                                     disabled
                                     placeholder="0.00"
                                     suffix={<TbCurrencyNaira size={20} className="text-gray-400" />}
+                                    className="h-12 text-lg font-medium"
                                 />
                             </FormItem>
                         </MotionDiv>
                     )}
 
-                    <MotionDiv className="flex items-end justify-end -mt-6" variants={staggerItemVariants}>
-                        <p className="text-base text-muted-foreground flex items-center">
-                            {amount || '0'} NGN = {amount ? (Number(amount) / 10000).toFixed(4) : '0.0000'} <Bitcoin className="text-primary -rotate-10" size={20} />
-                        </p>
-                    </MotionDiv>
+                    {!enablePreviewConversion && amount && Number(amount) > 0 && (
+                        <MotionDiv className="flex items-end justify-end -mt-6" variants={staggerItemVariants}>
+                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Bitcoin className="text-primary -rotate-10" size={16} />
+                                <span className="italic">
+                                    BCH equivalent will be shown in next step
+                                </span>
+                            </p>
+                        </MotionDiv>
+                    )}
 
                     <MotionDiv variants={staggerItemVariants}>
                         <Button
                             size="lg"
                             htmlType="submit"
                             fullWidth
-                            disabled={!phoneNumber || !amount || !selectedNetwork || !selectedPlan}
+                            disabled={!phoneNumber || !amount || !selectedNetwork || !selectedPlan || loading}
                             loading={loading}
                         >
-                            Continue
+                            {loading ? 'Creating Transaction...' : 'Continue'}
                         </Button>
                     </MotionDiv>
                 </Form>
@@ -216,13 +240,13 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                         {plans?.length > 0 ? (
                             plans?.map((plan) => (
                                 <div
-                                    key={plan.variation_code}
+                                    key={plan.planCode}
                                     onClick={() => handlePlanSelect(plan)}
                                     className="flex items-center justify-between px-3 py-1 border rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group"
                                 >
                                     <div className="flex flex-col">
                                         <b className="text-base group-hover:text-primary transition-colors">{plan.name}</b>
-                                        <span className="text-sm text-muted-foreground">₦{plan.variation_amount}</span>
+                                        <span className="text-sm text-muted-foreground">₦{plan.amount}</span>
                                     </div>
                                     <div className="flex flex-col items-end">
                                         <Wifi size={16} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
