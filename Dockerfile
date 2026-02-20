@@ -7,16 +7,16 @@ COPY package.json package-lock.json* ./
 
 # Copy workspace package.json files
 COPY server/package.json ./server/
-COPY shared/package.json ./shared/
+COPY packages/shared/package.json ./packages/shared/
 
 # Install dependencies (including devDependencies for building)
 RUN npm install
 
 # copy source code for server and shared
 COPY server ./server
-COPY shared ./shared
+COPY packages/shared ./packages/shared
 
-RUN npm run build:server
+RUN npm run build -w server
 
 # stage 2: Runner
 FROM node:20-alpine AS runner
@@ -33,7 +33,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/server/dist ./server/dist
 COPY --from=builder /app/server/package.json ./server/package.json
 
-COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/packages/shared ./packages/shared
 
 # Expose port
 EXPOSE 8000
