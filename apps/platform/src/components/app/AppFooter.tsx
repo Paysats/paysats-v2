@@ -22,13 +22,13 @@ export const AppFooter = () => {
 
                     {/* Center: Links */}
                     <div className="flex items-center gap-6 text-sm">
-                        <Link
-                            to={`${DOMAIN_URLS.LANDING}/support`}
+                        <a
+                            href={`${DOMAIN_URLS.LANDING}/support`}
                             className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
                         >
                             <Mail size={14} />
                             Support
-                        </Link>
+                        </a>
                         <a
                             href={`https://x.com/${config.app.X_HANDLE}`}
                             target="_blank"

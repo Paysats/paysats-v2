@@ -78,7 +78,7 @@ const DataFlowContent = () => {
             }
 
             try {
-                console.log('Checking restored transaction status:', paymentData.reference);
+
                 const txn = await transactionService.getTransaction(paymentData.reference);
                 setTransaction(txn);
 

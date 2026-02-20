@@ -6,13 +6,15 @@ import { Input, SearchInput } from "@shared-ui/Input"
 import { Modal } from "@shared-ui/Modal"
 import { NETWORK_PROVIDERS } from "@shared/utils/networkProviders"
 import type { DataPlanVariation } from "@shared/utils/dataPlans"
-import { Bitcoin, PhoneCall, ChevronRight, Wifi } from "lucide-react"
+import { Bitcoin, PhoneCall, ChevronRight, Wifi, Zap } from "lucide-react"
 import { TbCurrencyNaira } from "react-icons/tb"
 import { MotionDiv } from "@shared-ui/MotionComponents"
 import { staggerContainerVariants, staggerItemVariants, cardHoverVariants } from "@shared/config/animationConfig"
 import type { NetworkProviderEnum } from "@shared/types/network-provider.types"
 import { UtilityService } from "@/api/services/utility.service"
 import type { DataPlan } from "@/api/services/utility.service"
+import { GlowEffect } from "@shared-ui/GlowEffect"
+import { cn } from "@shared/utils/cn"
 
 interface DataFormProps {
     handleContinue: (data: any) => void;
@@ -163,24 +165,45 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                             label={<span className="font-medium">Select Data Plan</span>}
                             rules={[{ required: true, message: 'Please select a data plan' }]}
                         >
-                            <MotionDiv
-                                onClick={() => selectedNetwork && setIsPlanModalOpen(true)}
-                                className={`w-full min-h-14 px-4 flex items-center justify-between border rounded-xl cursor-pointer transition-all ${!selectedNetwork ? 'opacity-50 cursor-not-allowed bg-muted/50 border-dashed' : 'hover:border-primary border-input bg-card'}`}
-                                whileHover={selectedNetwork ? { scale: 1.01 } : {}}
-                                whileTap={selectedNetwork ? { scale: 0.99 } : {}}
-                            >
-                                {selectedPlan ? (
-                                    <div className="flex flex-col py-1">
-                                        <span className="font-semibold text-base">{selectedPlan.name}</span>
-                                        <span className="text-xs text-muted-foreground">₦{selectedPlan.amount}</span>
+                            <GlowEffect intensity="low" pulse={!!selectedPlan}>
+                                <MotionDiv
+                                    onClick={() => selectedNetwork && setIsPlanModalOpen(true)}
+                                    className={cn(
+                                        "w-full min-h-16 px-5 flex items-center justify-between border rounded-2xl cursor-pointer transition-all duration-300",
+                                        !selectedNetwork
+                                            ? 'opacity-50 cursor-not-allowed bg-muted/50 border-dashed'
+                                            : selectedPlan
+                                                ? 'border-primary bg-primary/5 shadow-sm'
+                                                : 'hover:border-primary border-input bg-card'
+                                    )}
+                                    whileHover={selectedNetwork ? { scale: 1.01 } : {}}
+                                    whileTap={selectedNetwork ? { scale: 0.99 } : {}}
+                                >
+                                    {selectedPlan ? (
+                                        <div className="flex flex-col py-2">
+                                            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-0.5">Selected Plan</span>
+                                            <span className="font-bold text-lg tracking-tight">{selectedPlan.name}</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                                <Wifi size={14} className="text-muted-foreground" />
+                                            </div>
+                                            <span className="text-muted-foreground font-medium">
+                                                {selectedNetwork ? "Choose a high-speed plan" : "Select network first"}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                        {selectedPlan && (
+                                            <span className="text-sm font-black text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                                ₦{selectedPlan.amount}
+                                            </span>
+                                        )}
+                                        <ChevronRight size={20} className={cn("transition-transform duration-300", isPlanModalOpen && "rotate-90")} />
                                     </div>
-                                ) : (
-                                    <span className="text-muted-foreground font-medium">
-                                        {selectedNetwork ? "Choose a plan" : "Select network first"}
-                                    </span>
-                                )}
-                                <ChevronRight size={20} className="text-muted-foreground" />
-                            </MotionDiv>
+                                </MotionDiv>
+                            </GlowEffect>
                         </FormItem>
                     </MotionDiv>
 
@@ -219,7 +242,7 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
                             disabled={!phoneNumber || !amount || !selectedNetwork || !selectedPlan || loading}
                             loading={loading}
                         >
-                            {loading ? 'Creating Transaction...' : 'Continue'}
+                            {loading ? 'Initiating Protocol...' : 'Continue'}
                         </Button>
                     </MotionDiv>
                 </Form>
@@ -228,37 +251,86 @@ export const Data: FC<DataFormProps> = ({ handleContinue, loading }) => {
             <Modal
                 isOpen={isPlanModalOpen}
                 onClose={() => setIsPlanModalOpen(false)}
-                title={`Select ${selectedNetwork} Data Plan`}
+                title={
+                    <div className="flex flex-col">
+                        <h2 className="text-2xl font-black tracking-tight">Select {selectedNetwork} Plan</h2>
+                    </div>
+                }
+                width={600}
             >
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6 py-2">
                     <SearchInput
-                        placeholder="Search for a plan..."
+                        placeholder="Search for a connectivity package..."
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        className="bg-secondary/10 border-none h-14 text-base"
                     />
 
-                    <div className="flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-1">
+                    <MotionDiv
+                        variants={staggerContainerVariants}
+                        initial="initial"
+                        animate="animate"
+                        className="grid grid-cols-1 gap-3 max-h-[450px] overflow-y-auto pr-1 custom-scrollbar"
+                    >
                         {plans?.length > 0 ? (
-                            plans?.map((plan) => (
-                                <div
+                            plans?.map((plan, index) => (
+                                <MotionDiv
                                     key={plan.planCode}
+                                    variants={staggerItemVariants}
+                                    whileHover={{ scale: 1.01, x: 4 }}
+                                    whileTap={{ scale: 0.99 }}
                                     onClick={() => handlePlanSelect(plan)}
-                                    className="flex items-center justify-between px-3 py-1 border rounded-xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group"
+                                    className={cn(
+                                        "relative overflow-hidden group p-5 rounded-2xl border transition-all duration-300 cursor-pointer",
+                                        selectedPlan?.planCode === plan.planCode
+                                            ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                                            : "border-border/40 bg-card hover:border-primary/50 hover:bg-muted/30"
+                                    )}
                                 >
-                                    <div className="flex flex-col">
-                                        <b className="text-base group-hover:text-primary transition-colors">{plan.name}</b>
-                                        <span className="text-sm text-muted-foreground">₦{plan.amount}</span>
+                                    <div className="flex justify-between items-center relative z-10">
+                                        <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-2">
+                                                <Zap size={10} className="text-primary animate-pulse" />
+                                                <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">
+                                                    Fast Fulfillment
+                                                </span>
+                                            </div>
+                                            <h4 className="text-lg font-bold tracking-tight group-hover:text-primary transition-colors">
+                                                {plan.name}
+                                            </h4>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-2xl font-black tracking-tighter">₦{plan.amount}</span>
+                                                <div className="h-1 w-1 rounded-full bg-border" />
+                                                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Instant Signal</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-3">
+                                            <div className={cn(
+                                                "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500",
+                                                selectedPlan?.planCode === plan.planCode
+                                                    ? "bg-primary text-background rotate-12 shadow-lg shadow-primary/20"
+                                                    : "bg-secondary/20 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary group-hover:rotate-6"
+                                            )}>
+                                                <Wifi size={24} className={cn("transition-all duration-500", selectedPlan?.planCode === plan.planCode ? "scale-110" : "opacity-30 group-hover:opacity-100")} />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col items-end">
-                                        <Wifi size={16} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </div>
-                                </div>
+
+                                    {/* Subtle background glow on hover */}
+                                    <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
+                                </MotionDiv>
                             ))
                         ) : (
-                            <div className="py-10 text-center text-muted-foreground">
-                                No plans found for "{searchQuery}"
+                            <div className="py-20 flex flex-col items-center justify-center gap-4 text-center">
+                                <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center">
+                                    <Wifi size={32} className="text-muted-foreground/20" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-bold text-muted-foreground">No matching frequency found</p>
+                                    <p className="text-xs text-muted-foreground/60 uppercase tracking-widest mt-1">Adjust your search parameters</p>
+                                </div>
                             </div>
                         )}
-                    </div>
+                    </MotionDiv>
                 </div>
             </Modal>
         </AppLayout>

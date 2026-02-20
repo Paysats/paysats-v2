@@ -19,17 +19,17 @@ export const usePaymentSocket = (reference: string | undefined, onPaymentUpdate:
         const socket = socketRef.current;
 
         socket.on('connect', () => {
-            console.log('Socket connected, joining room:', reference);
+
             socket.emit('join_transaction', reference);
         });
 
         socket.on('payment_update', (data) => {
-            console.log('Socket payment update:', data);
+
             onPaymentUpdate(data);
         });
 
         socket.on('disconnect', () => {
-            console.log('Socket disconnected');
+
         });
 
         return () => {

@@ -71,7 +71,7 @@ const AirtimeFlowContent = () => {
             }
 
             try {
-                console.log('Checking restored transaction status:', paymentData.reference);
+
                 const txn = await transactionService.getTransaction(paymentData.reference);
                 setTransaction(txn);
 
@@ -138,7 +138,7 @@ const AirtimeFlowContent = () => {
                 phoneNumber: formData.phoneNumber,
                 amount: Number(formData.amount),
             });
-            console.log('airtime transaction result ===> :', result);
+
             const bchAmount = result.transaction.amount.bch;
             const bchRate = result.transaction.amount.rate;
 

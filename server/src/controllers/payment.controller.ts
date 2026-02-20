@@ -11,7 +11,7 @@ export class PaymentController {
     static purchaseAirtime = catchAsAsync(async (req: Request, res: Response) => {
         const { network, phoneNumber, amount } = req.body;
 
-        console.log("Received purchaseAirtime request with body:", req.body);
+
 
         // Create transaction and get payment details
         const result = await TransactionService.createAirtimeTransaction({
@@ -34,7 +34,7 @@ export class PaymentController {
     static purchaseData = catchAsAsync(async (req: Request, res: Response) => {
         const { network, phoneNumber, planCode, amount } = req.body;
 
-        console.log("Received purchaseData request with body:", req.body);
+
 
         // create transaction and get payment details
         const result = await TransactionService.createDataTransaction({

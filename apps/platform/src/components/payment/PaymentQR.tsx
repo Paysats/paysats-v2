@@ -97,8 +97,8 @@ export const PaymentQR = ({ data, qrUrl, paymentLink, onCancel, onManualCheck, l
                 variants={staggerItemVariants}
                 className="flex flex-col items-center gap-1"
             >
-                <h2 className="text-4xl font-bold text-foreground">
-                    {bchAmount.toFixed(4)} BCH
+                <h2 className="text-4xl text-center font-bold text-foreground">
+                    {bchAmount} BCH
                 </h2>
                 <p className="text-muted-foreground">
                     ≈ ${amountUSD.toFixed(2)} USD
