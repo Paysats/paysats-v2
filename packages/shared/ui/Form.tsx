@@ -1,4 +1,3 @@
-// @ts-ignore
 import React from 'react';
 import { Form as AntForm } from 'antd';
 import type { FormProps as AntFormProps, FormItemProps as AntFormItemProps } from 'antd';
@@ -92,7 +91,7 @@ export const Form = <Values extends Record<string, unknown> = Record<string, unk
 }: FormProps<Values>) => {
   return (
     <AntForm
-      className={cn(formVariants({ variant, size }), className)}
+      className={cn(formVariants({ variant, size: size as any }), className)}
       size={size}
       {...props}
     >
@@ -127,8 +126,8 @@ export const FormItem = ({
 
 export { List, useForm, useWatch, ErrorList, Provider };
 
-export const FormLabel = ({ 
-  className, 
+export const FormLabel = ({
+  className,
   children,
   ...props
 }: React.LabelHTMLAttributes<HTMLLabelElement>) => (
