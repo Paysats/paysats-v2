@@ -51,7 +51,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, active
 export const DashSidebar: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const logout = useDashAuthStore(state => state.logout);
+    const logout = useDashAuthStore((state: any) => state.logout);
     const { isSidebarOpen, toggleSidebar } = useUIStore();
 
     const menuItems = [

@@ -20,7 +20,7 @@ interface AdminAuthState {
 
 export const useDashAuthStore = create<AdminAuthState>()(
     persist(
-        (set) => ({
+        (set: any): AdminAuthState => ({
             admin: null,
             token: null,
             isAuthenticated: false,
@@ -67,7 +67,7 @@ export const useDashAuthStore = create<AdminAuthState>()(
         {
             name: 'admin-auth-storage',
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({
+            partialize: (state: any) => ({
                 admin: state.admin,
                 token: state.token,
                 isAuthenticated: state.isAuthenticated,

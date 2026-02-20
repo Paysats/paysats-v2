@@ -13,14 +13,14 @@ import { Logo } from '@shared/ui/Logo';
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
-    const login = useDashAuthStore(state => state.login);
+    const login = useDashAuthStore((state: any) => state.login);
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = React.useState(false);
 
     const onFinish = async (values: any) => {
         setIsLoading(true);
         try {
-            const response = await dashService.login(values);
+            const response: any = await dashService.login(values);
             if (response.success) {
                 login(response.data.token, response.data.admin);
                 toast.success('Access granted. Welcome to the Vault.');
@@ -48,7 +48,7 @@ const LoginPage: React.FC = () => {
                     <div className="p-8 sm:p-12 space-y-10">
                         <div className="text-center space-y-4">
                             <div className="flex justify-center">
-                                <Logo size="xlarge"  />
+                                <Logo size="xlarge" />
                             </div>
                             <div className="space-y-2">
                                 <h1 className="text-3xl font-black text-foreground tracking-tight">Dash Vault</h1>

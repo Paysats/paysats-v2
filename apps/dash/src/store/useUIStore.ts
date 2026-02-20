@@ -9,11 +9,11 @@ interface UIState {
     setMobileMenuOpen: (isOpen: boolean) => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
+export const useUIStore = create<UIState>((set: any) => ({
     isSidebarOpen: true,
     isMobileMenuOpen: false,
-    toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-    setSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
-    toggleMobileMenu: () => set((state) => ({ isMobileMenuOpen: !state.isMobileMenuOpen })),
-    setMobileMenuOpen: (isOpen) => set({ isMobileMenuOpen: isOpen }),
+    toggleSidebar: () => set((state: any) => ({ isSidebarOpen: !state.isSidebarOpen })),
+    setSidebarOpen: (isOpen: boolean) => set({ isSidebarOpen: isOpen }),
+    toggleMobileMenu: () => set((state: any) => ({ isMobileMenuOpen: !state.isMobileMenuOpen })),
+    setMobileMenuOpen: (isOpen: boolean) => set({ isMobileMenuOpen: isOpen }),
 }));

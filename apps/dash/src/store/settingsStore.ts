@@ -9,7 +9,7 @@ interface SettingsState {
     updateServiceStatus: (serviceType: string, enabled: boolean) => Promise<void>;
 }
 
-export const useSettingsStore = create<SettingsState>((set) => ({
+export const useSettingsStore = create<SettingsState>((set: any) => ({
     settings: null,
     isLoading: false,
     error: null,
