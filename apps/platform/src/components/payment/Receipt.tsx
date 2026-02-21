@@ -1,4 +1,5 @@
-import { Check, Bitcoin } from "lucide-react";
+import { Check } from "lucide-react";
+import { Logo } from "@shared/ui/Logo";
 import { formatNGN } from "@shared/utils";
 
 export interface ReceiptData {
@@ -41,10 +42,7 @@ export const Receipt = ({ data }: ReceiptProps) => {
 
                 {/* Logo */}
                 <div className="relative z-10 flex items-center justify-center mb-4">
-                    <div className="flex items-center gap-2">
-                        <Bitcoin size={32} strokeWidth={2.5} />
-                        <span className="text-3xl font-bold">Paysats</span>
-                    </div>
+                    <Logo withTitle size="large" className="invert brightness-0" />
                 </div>
 
                 <div className="relative z-10 flex justify-center mb-4">
@@ -65,8 +63,7 @@ export const Receipt = ({ data }: ReceiptProps) => {
                     <p className="text-gray-500 text-sm mb-2">Amount Paid</p>
                     <p className="text-4xl font-bold text-gray-900">{formatNGN(amount)}</p>
                     <p className="text-gray-500 mt-2 flex items-center justify-center gap-1">
-                        <Bitcoin size={16} className="text-[#0AC18E]" />
-                        <span>{bchAmount.toFixed(6)} BCH</span>
+                        <span className="font-medium">{bchAmount.toFixed(6)} BCH</span>
                     </p>
                 </div>
 

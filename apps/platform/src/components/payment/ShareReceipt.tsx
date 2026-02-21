@@ -1,4 +1,5 @@
 import { Download, Copy, Zap } from "lucide-react";
+import { Logo } from "@shared/ui/Logo";
 import { Button } from "@shared-ui/Button";
 import { MotionDiv } from "@shared-ui/MotionComponents";
 import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig";
@@ -65,7 +66,8 @@ export const ShareReceipt = ({ data, onDownload }: ShareReceiptProps) => {
                 variants={staggerItemVariants}
                 className="flex flex-col items-center gap-3"
             >
-                <h1 className="text-4xl font-bold text-foreground">
+                <Logo withTitle size="xxlarge" />
+                <h1 className="text-4xl font-black text-foreground text-center mt-2">
                     {title}
                 </h1>
             </MotionDiv>

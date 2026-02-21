@@ -1,4 +1,5 @@
 import { Check, Download, Share2 } from "lucide-react";
+import { Logo } from "@shared/ui/Logo";
 import { Button } from "@shared-ui/Button";
 import { MotionDiv } from "@shared-ui/MotionComponents";
 import { staggerContainerVariants, staggerItemVariants } from "@shared/config/animationConfig";
@@ -27,11 +28,14 @@ export const PaymentSuccess = ({ data, onShare, onDownload, onClose }: PaymentSu
 
     return (
         <MotionDiv
-            className="h-full flex flex-col items-center justify-center gap-6 max-w-md mx-auto min-h-[60vh]"
+            className="h-full flex flex-col items-center justify-center gap-6 max-w-md mx-auto min-h-[60vh] py-8"
             variants={staggerContainerVariants}
             initial="initial"
             animate="animate"
         >
+            <MotionDiv variants={staggerItemVariants} className="mb-2">
+                <Logo withTitle size="large" />
+            </MotionDiv>
             <MotionDiv
                 variants={staggerItemVariants}
                 className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center"
