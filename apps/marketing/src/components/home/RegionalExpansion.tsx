@@ -100,7 +100,7 @@ export const RegionalExpansion: FC = () => {
             </div>
 
             <div className="max-w-6xl mx-auto px-4 relative">
-                
+
                 <div className="flex flex-col items-center text-center  max-w-2xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -183,14 +183,14 @@ export const RegionalExpansion: FC = () => {
                                     repeatCount="indefinite"
                                     path="M 500 300 L 250 300"
                                 />
-                                <motion.animate
+                                <animate
                                     attributeName="opacity"
                                     values="0;1;0"
                                     dur="3s"
                                     begin={`${delay}s`}
                                     repeatCount="indefinite"
                                 />
-                                <motion.animate
+                                <animate
                                     attributeName="r"
                                     values="0;4;0"
                                     dur="3s"
