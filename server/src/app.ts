@@ -31,8 +31,11 @@ initSocketService(server);
 app.use(cors({
     origin: [
         `https://${config.app.FRONTEND_URL}`,
+        `https://www.${config.app.FRONTEND_URL}`,
         `https://dash.${config.app.FRONTEND_URL}`,
+        `https://www.dash.${config.app.FRONTEND_URL}`,
         `https://app.${config.app.FRONTEND_URL}`,
+        `https://www.app.${config.app.FRONTEND_URL}`,
         "http://localhost:3000",
         "http://localhost:3001",
         "http://localhost:3002",
