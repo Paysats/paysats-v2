@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import { ConfigProvider, theme } from 'antd'
 import { MarketingRoutes } from './routes/MarketingRoutes';
-import { PWAInstallPrompt } from '../../../packages/shared/src/components/PWAInstallPrompt';
 
 function App() {
   const [mounted, setMounted] = useState(false);
@@ -31,7 +30,6 @@ function App() {
       }}
     >
       <MarketingRoutes />
-      <PWAInstallPrompt />
     </ConfigProvider>
   )
 }
