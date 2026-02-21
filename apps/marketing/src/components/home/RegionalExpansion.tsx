@@ -87,7 +87,7 @@ const CountryNode: FC<NodeProps> = ({ country, flag, status, delay, position }) 
 
 export const RegionalExpansion: FC = () => {
     return (
-        <section className="w-full py-32 relative overflow-hidden bg-background">
+        <section className="w-full pb-32 relative overflow-hidden bg-background">
             {/* grids */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute inset-0 opacity-[0.05]"
