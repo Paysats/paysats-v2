@@ -1,15 +1,17 @@
 import { Header } from "@/components/home/Header"
 import { Hero } from "@/components/home/Hero"
 import { ServiceGrid } from "@/components/home/ServiceGrid"
+import { RegionalExpansion } from "@/components/home/RegionalExpansion"
 import { Footer } from "@/components/home/Footer"
 
 export const Homepage = () => {
     return (
         <div className="min-h-screen flex flex-col bg-background selection:bg-primary selection:text-white">
             <Header />
-            <main className="flex-grow flex flex-col items-center justify-center max-w-7xl mx-auto w-full px-4">
+            <main className="flex-grow flex flex-col items-center justify-center max-w-7xl mx-auto w-full px-4 overflow-hidden">
                 <Hero />
                 <ServiceGrid />
+                <RegionalExpansion />
             </main>
             <Footer />
         </div>

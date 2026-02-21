@@ -28,7 +28,7 @@ export const Hero: FC = () => {
                 className="text-primary-700 text-base font-medium"
                 variants={staggerItemVariants}
             >
-                Pay for everyday services like airtime &amp; data instantly using Bitcoin Cash.
+                Pay for everyday services like airtime &amp; internet subscription instantly using Bitcoin Cash.
             </MotionP>
         </MotionDiv>
     )
