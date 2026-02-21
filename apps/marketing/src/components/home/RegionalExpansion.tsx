@@ -63,7 +63,7 @@ const CountryNode: FC<NodeProps> = ({ country, flag, status, delay, position }) 
                 </GlowEffect>
 
                 {/* status indicator dot */}
-                <div className={`absolute -top-0 -right-0.5 w-4 h-4 rounded-full border-2 border-background z-30 ${status === 'active' ? 'bg-primary' : 'bg-zinc-600'}`}>
+                <div className={`absolute top-0 -right-0.5 w-4 h-4 rounded-full border-2 border-background z-30 ${status === 'active' ? 'bg-primary' : 'bg-zinc-600'}`}>
                     {status === 'active' && <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />}
                 </div>
             </div>
@@ -96,7 +96,7 @@ export const RegionalExpansion: FC = () => {
                         backgroundSize: '80px 80px'
                     }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+                <div className="absolute inset-0 bg-linear-to-b from-background via-transparent to-background" />
             </div>
 
             <div className="max-w-6xl mx-auto px-4 relative">

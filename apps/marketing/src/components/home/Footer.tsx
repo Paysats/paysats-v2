@@ -30,7 +30,7 @@ export const Footer: FC = () => {
                     <Link to="/terms" className="text-[11px] font-black tracking-[0.3em] uppercase text-zinc-500 hover:text-primary transition-colors">Terms</Link>
                     <Link to="/support" className="text-[11px] font-black tracking-[0.3em] uppercase text-zinc-500 hover:text-primary transition-colors">Support</Link>
                     <a href={`https://x.com/${config.app.X_HANDLE}`} target="_blank" rel="noopener noreferrer" className="text-[11px] font-black tracking-[0.3em] uppercase text-zinc-500 hover:text-primary transition-colors">X</a>
-                    <a href="https://github.com/paysats" target="_blank" rel="noopener noreferrer" className="text-[11px] font-black tracking-[0.3em] uppercase text-zinc-500 hover:text-primary transition-colors">Github</a>
+                    <a href="https://t.me/+X0aDT1Gy2dM3OWU8" target="_blank" rel="noopener noreferrer" className="text-[11px] font-black tracking-[0.3em] uppercase text-zinc-500 hover:text-primary transition-colors">Telegram</a>
                 </MotionDiv>
 
                 <MotionDiv variants={staggerItemVariants} className="flex flex-col items-center mb-24">
@@ -48,7 +48,7 @@ export const Footer: FC = () => {
                 >
                     <div className="h-px bg-zinc-800 flex-grow max-w-[100px]" />
                     <span className="text-[10px] font-black tracking-[0.5em] uppercase text-zinc-600">
-                        Saling Global Utility
+                        Scaling Global Utility
                     </span>
                     <div className="h-px bg-zinc-800 flex-grow max-w-[100px]" />
                 </MotionDiv>
