@@ -11,8 +11,9 @@
   "scripts": {
     "dev:marketing": "npm run dev -w apps/marketing",
     "dev:platform": "npm run dev -w apps/platform",
+    "dev:dash": "npm run dev -w apps/dash",
     "dev:server": "npm run dev -w server",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:marketing\" \"npm run dev:platform\"",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:marketing\" \"npm run dev:platform\" \"npm run dev:dash\"",
     "build:server": "npm run build -w server",
     "build:marketing": "npm run build -w apps/marketing",
     "build": "npm run build -w server && npm run build -w apps/marketing",
