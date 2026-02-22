@@ -41,7 +41,7 @@ export const Hero: FC = () => {
                 </MotionH1>
 
                 <MotionP
-                    className="text-muted-foreground text-base md:text-lg font-medium max-w-2xl mx-auto mb-12 leading-relaxed"
+                    className="text-muted-foreground text-sm md:text-base font-medium max-w-2xl mx-auto mb-12 leading-relaxed"
                     variants={staggerItemVariants}
                 >
                     Seamlessly pay for everyday services like airtime, internet subscription and utilities across Africa using the world's most efficient p2p electronic cash ($BCH).
