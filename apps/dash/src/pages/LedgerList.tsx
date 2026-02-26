@@ -20,8 +20,10 @@ import { staggerContainerVariants, staggerItemVariants } from '@shared/config/an
 import { Card } from '@shared/ui/Card';
 import { cn } from '@shared/utils/cn';
 import { toast } from 'react-next-toast';
-import { Table, Select, Input, Tag, Space, ConfigProvider, theme } from 'antd';
+import { Table, Tag, Space, ConfigProvider, theme } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { Input } from '@shared/ui/Input';
+import { Select } from '@shared/ui/Select';
 
 const StatusBadge: React.FC<{ status: TransactionStatusEnum | string }> = ({ status }) => {
     const config: Record<string, { label: string; icon: React.ElementType; color: string; bg: string; border: string }> = {
@@ -174,6 +176,13 @@ const LedgerList: React.FC = () => {
                     Pagination: {
                         itemBg: 'transparent',
                         itemActiveBg: 'rgba(51, 194, 121, 0.1)',
+                    },
+                    Select: {
+                        colorBgContainer: 'rgba(255, 255, 255, 0.05)',
+                        colorBgElevated: '#1f362b', // Dark green-gray matching the theme
+                        colorText: 'rgba(255, 255, 255, 0.9)',
+                        colorTextPlaceholder: 'rgba(255, 255, 255, 0.3)',
+                        optionSelectedBg: 'rgba(51, 194, 121, 0.15)',
                     }
                 }
             }}

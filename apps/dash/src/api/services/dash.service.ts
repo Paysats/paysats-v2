@@ -60,7 +60,7 @@ export const dashService = {
 
     getTransactions: async (params: any): Promise<{ data: IAdminTransaction[], meta: any }> => {
         const response = await api.get('/transactions', { params });
-        return (response as any).data;
+        return response as any;
     },
 
     getTransactionDetails: async (reference: string): Promise<IAdminTransaction> => {

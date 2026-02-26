@@ -3,9 +3,8 @@ import { UserModel } from '../models/User';
 import { TransactionModel } from '../models/Transaction';
 import { getSettings } from '../models/Settings';
 import { generateAccessToken } from '../utils/jwt.utils';
-import { responseHandler, sendSuccess, throwResponse } from '../utils/responseHandler';
+import { sendSuccess, throwResponse } from '../utils/responseHandler';
 import { catchAsAsync } from '../utils/catchAsAsync';
-import logger from '../utils/logger';
 import { TransactionService } from '../services/transaction.service';
 import { BCHRateService } from '@/services/bchRate.service';
 

@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { ConfigProvider, theme } from 'antd'
+import { ConfigProvider, theme, notification } from 'antd'
 import { DashRoutes } from './routes/DashRoutes';
 import { ThemeProvider } from '@shared/contexts/ThemeContext';
+
+notification.config({
+  maxCount: 2,
+});
 
 function App() {
   const [mounted, setMounted] = useState(false);
