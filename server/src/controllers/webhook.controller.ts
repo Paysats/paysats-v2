@@ -54,7 +54,6 @@ export const handlePromptCashWebhook = async (req: Request, res: Response) => {
             processing_time_ms: processingTime,
         });
 
-        // 4. return success
         res.status(200).json({ success: true });
     } catch (error: any) {
         logger.error('Error handling Prompt.cash webhook', {
@@ -62,7 +61,7 @@ export const handlePromptCashWebhook = async (req: Request, res: Response) => {
             tx_id: req.body?.payment?.tx_id
         });
 
-        // Return 200 to prevent retries for invalid data
+        // returning 200 to prevent retries for invalid data
         res.status(200).json({ success: false, error: error?.message });
     }
 };

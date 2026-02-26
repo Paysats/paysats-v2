@@ -169,6 +169,37 @@ export class TransactionService {
             await payment.save({ session });
 
             if (paymentData.status === 'PAID') {
+                // 1.5 strict amount validation: ensure user didn't underpay
+                const paidAmount = Number(paymentData.paid_amount_crypto);
+                const expectedAmount = payment.amountBch;
+
+                // allowing for a tiny rounding difference if necessary (1 satoshi)
+                const SATOSHI_EPSILON = 0.00000001;
+
+                if (paidAmount < (expectedAmount - SATOSHI_EPSILON)) {
+                    logger.error('CRITICALLLLL: Underpayment detected for transaction', {
+                        reference,
+                        expected: expectedAmount,
+                        received: paidAmount,
+                        diff: expectedAmount - paidAmount
+                    });
+
+                    payment.status = PaymentStatusEnum.FAILED;
+                    await payment.save({ session });
+
+                    await TransactionModel.findByIdAndUpdate(
+                        transaction._id,
+                        {
+                            status: TransactionStatusEnum.FAILED,
+                            failureReason: `Underpayment: Received ${paidAmount} BCH, expected ${expectedAmount} BCH`
+                        },
+                        { session }
+                    );
+
+                    await session.commitTransaction();
+                    return transaction;
+                }
+
                 const trxData = {
                     status: TransactionStatusEnum.PAYMENT_CONFIRMED,
                     paidAt: new Date(),
@@ -349,6 +380,7 @@ export class TransactionService {
 
         return transaction;
     }
+
     static async createDataTransaction(params: ICreateDataTransactionParams) {
         const session = await mongoose.startSession();
         session.startTransaction();
